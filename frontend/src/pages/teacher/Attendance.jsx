@@ -1,0 +1,86 @@
+import { useEffect, useState } from "react";
+import Layout from "../../components/Layout";
+import PageTitle from "../../components/PageTitle";
+import Button from "../../components/Button";
+import axiosInstance from "../../api/axiosInstance";
+
+export default function Attendance() {
+  const [classes, setClasses] = useState([]);
+  const [classId, setClassId] = useState("");
+  const [students, setStudents] = useState([]);
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [statusMap, setStatusMap] = useState({});
+
+  useEffect(() => {
+    axiosInstance.get("/teacher/classes").then((res) => setClasses(res.data.data));
+  }, []);
+
+  useEffect(() => {
+    if (!classId) return;
+    axiosInstance.get(`/teacher/class/${classId}/students`).then((res) => {
+      setStudents(res.data.data);
+      const initial = {};
+      res.data.data.forEach((s) => (initial[s._id] = "PRESENT"));
+      setStatusMap(initial);
+    });
+  }, [classId]);
+
+  const saveAttendance = async () => {
+    const records = Object.keys(statusMap).map((studentId) => ({
+      studentId,
+      status: statusMap[studentId],
+    }));
+
+    await axiosInstance.post("/teacher/attendance", { classId, date, records });
+    alert("Attendance Saved ✅");
+  };
+
+  return (
+    <Layout>
+      <PageTitle title="Mark Attendance" subtitle="Select class & mark attendance" />
+
+      <div className="bg-white border rounded-2xl p-6 shadow mb-6 grid md:grid-cols-3 gap-4">
+        <div>
+          <label className="text-sm text-gray-600">Class</label>
+          <select value={classId} onChange={(e) => setClassId(e.target.value)} className="w-full border rounded-xl p-3 mt-1">
+            <option value="">Select class</option>
+            {classes.map((c) => (
+              <option key={c._id} value={c._id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="text-sm text-gray-600">Date</label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full border rounded-xl p-3 mt-1" />
+        </div>
+
+        <div className="flex items-end">
+          <Button onClick={saveAttendance} className="w-full">Save Attendance</Button>
+        </div>
+      </div>
+
+      <div className="bg-white border rounded-2xl p-6 shadow">
+        <h3 className="font-bold mb-4">Students</h3>
+
+        {students.map((s) => (
+          <div key={s._id} className="flex items-center justify-between border-b py-3 last:border-b-0">
+            <div>
+              <p className="font-semibold">{s?.user?.name}</p>
+              <p className="text-sm text-gray-500">{s?.rollNo || ""}</p>
+            </div>
+
+            <select
+              value={statusMap[s._id] || "PRESENT"}
+              onChange={(e) => setStatusMap({ ...statusMap, [s._id]: e.target.value })}
+              className="border rounded-xl p-2"
+            >
+              <option value="PRESENT">PRESENT</option>
+              <option value="ABSENT">ABSENT</option>
+            </select>
+          </div>
+        ))}
+      </div>
+    </Layout>
+  );
+}
