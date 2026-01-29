@@ -93,7 +93,7 @@ export const todayAttendanceStatus = async (req, res) => {
 
 export const bulkUploadMarks = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "CSV file required" });
+    if (!req.file) return res.status(400).json({ message: "File required" });
 
     const teacher = await Teacher.findOne({ user: req.user._id });
     if (!teacher) return res.status(404).json({ message: "Teacher not found" });
@@ -163,7 +163,7 @@ export const bulkUploadMarks = async (req, res) => {
 
 export const bulkUploadAttendance = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "CSV file required" });
+    if (!req.file) return res.status(400).json({ message: "File required" });
 
     const teacher = await Teacher.findOne({ user: req.user._id });
     if (!teacher) return res.status(404).json({ message: "Teacher not found" });
@@ -178,7 +178,7 @@ export const bulkUploadAttendance = async (req, res) => {
     const cls = await ClassModel.findOne({ _id: classId, teacher: teacher._id });
     if (!cls) return res.status(403).json({ message: "You are not assigned to this class" });
 
-    const rows = await parseCsvBuffer(req.file.buffer);
+    const rows = await parseUploadedFile(req.file);
 
     let created = 0;
     let failed = 0;
