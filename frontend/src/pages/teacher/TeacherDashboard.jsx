@@ -18,9 +18,9 @@ export default function TeacherDashboard() {
   }, []);
 
   const StatCard = ({ title, value }) => (
-    <div className="bg-white border rounded-2xl p-6 shadow">
-      <p className="text-gray-500 text-sm">{title}</p>
-      <h2 className="text-xl font-bold mt-2">{value}</h2>
+    <div className="card p-6">
+      <p className="text-slate-500 text-sm">{title}</p>
+      <h2 className="text-xl font-semibold mt-2 text-slate-900">{value}</h2>
     </div>
   );
 
@@ -37,33 +37,33 @@ export default function TeacherDashboard() {
 
       {/* Attendance Status + Quick Actions */}
       <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white border rounded-2xl p-6 shadow">
-          <h3 className="text-lg font-bold mb-2">Today Attendance Status</h3>
-          <p className="text-gray-500 text-sm mb-4">
+        <div className="card p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Today Attendance Status</h3>
+          <p className="text-slate-500 text-sm mb-4">
             Date: <b>{status?.today || "-"}</b>
           </p>
 
           <div className="flex items-center gap-3">
             <span
-              className={`px-4 py-2 rounded-xl font-semibold ${
+              className={`px-4 py-2 rounded-xl font-semibold text-sm ${
                 status?.attendanceMarked
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-rose-100 text-rose-700"
               }`}
             >
               {status?.attendanceMarked ? "Marked ✅" : "Not Marked ❌"}
             </span>
 
-            <span className="text-gray-600 text-sm">
+            <span className="text-slate-600 text-sm">
               Classes: <b>{status?.totalClasses ?? 0}</b>
             </span>
           </div>
         </div>
 
-        <div className="bg-white border rounded-2xl p-6 shadow">
-          <h3 className="text-lg font-bold mb-2">Quick Actions</h3>
-          <p className="text-gray-500 text-sm mb-4">
-            सीधे attendance / marks page खोलो
+        <div className="card p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Quick Actions</h3>
+          <p className="text-slate-500 text-sm mb-4">
+            Jump to attendance or marks
           </p>
 
           <div className="flex gap-3">
@@ -79,18 +79,18 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Profile Details */}
-      <div className="bg-white border rounded-2xl p-6 shadow">
-        <h3 className="text-lg font-bold mb-4">Profile Details</h3>
+      <div className="card p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Profile Details</h3>
 
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <p className="text-sm text-gray-500">Phone</p>
-            <p className="font-semibold">{profile?.phone || "-"}</p>
+            <p className="text-sm text-slate-500">Phone</p>
+            <p className="font-semibold text-slate-900">{profile?.phone || "-"}</p>
           </div>
 
           <div>
-            <p className="text-sm text-gray-500">Role</p>
-            <p className="font-semibold">{profile?.user?.role || "-"}</p>
+            <p className="text-sm text-slate-500">Role</p>
+            <p className="font-semibold text-slate-900">{profile?.user?.role || "-"}</p>
           </div>
         </div>
       </div>

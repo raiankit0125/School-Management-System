@@ -31,10 +31,14 @@ export default function Layout({ children }) {
         ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="app-shell flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r p-4 hidden md:block">
-        <h2 className="text-xl font-bold text-indigo-600 mb-6">School System</h2>
+      <aside className="w-72 bg-white/90 border-r border-slate-200/60 p-5 hidden lg:flex flex-col gap-8 shadow-[6px_0_30px_-26px_rgba(15,23,42,0.6)]">
+        <div className="rounded-2xl bg-gradient-to-br from-teal-600 via-cyan-600 to-sky-600 p-5 text-white shadow-lg">
+          <p className="text-xs uppercase tracking-widest text-white/70">Portal</p>
+          <h2 className="text-2xl font-semibold mt-2">School System</h2>
+          <p className="text-sm text-white/80 mt-1">Manage with clarity</p>
+        </div>
 
         <nav className="flex flex-col gap-2">
           {links.map((l) => (
@@ -42,8 +46,10 @@ export default function Layout({ children }) {
               key={l.to}
               to={l.to}
               className={({ isActive }) =>
-                `px-4 py-2 rounded-xl font-medium ${
-                  isActive ? "bg-indigo-600 text-white" : "text-gray-700 hover:bg-gray-100"
+                `px-4 py-2.5 rounded-xl text-sm font-semibold transition ${
+                  isActive
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100"
                 }`
               }
             >
@@ -51,15 +57,21 @@ export default function Layout({ children }) {
             </NavLink>
           ))}
         </nav>
+
+        <div className="mt-auto rounded-2xl border border-slate-200/70 bg-white/80 p-4">
+          <p className="text-xs text-slate-500">Signed in as</p>
+          <p className="mt-1 text-sm font-semibold text-slate-800">{user?.name}</p>
+          <p className="text-xs text-slate-500">{user?.role}</p>
+        </div>
       </aside>
 
       {/* Main */}
       <div className="flex-1">
         {/* Navbar */}
-        <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
+        <header className="sticky top-0 z-10 backdrop-blur bg-white/80 border-b border-slate-200/70 px-6 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-lg font-semibold">{user?.role} Panel</h1>
-            <p className="text-sm text-gray-500">{user?.name}</p>
+            <h1 className="text-lg font-semibold text-slate-900">{user?.role} Panel</h1>
+            <p className="text-sm text-slate-500">{user?.name}</p>
           </div>
 
           <Button
@@ -73,7 +85,7 @@ export default function Layout({ children }) {
           </Button>
         </header>
 
-        <main className="p-6">{children}</main>
+        <main className="p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

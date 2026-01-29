@@ -72,14 +72,14 @@ export default function BulkMarksUpload() {
         <Layout>
             <PageTitle title="Bulk Marks Upload" subtitle="Upload marks CSV class-wise" />
 
-            <div className="bg-white border rounded-2xl p-6 shadow space-y-4">
+            <div className="card p-6 space-y-4">
                 <div className="grid md:grid-cols-4 gap-4">
                     <div>
-                        <label className="text-sm text-gray-600">Class</label>
+                        <label className="label">Class</label>
                         <select
                             value={classId}
                             onChange={(e) => setClassId(e.target.value)}
-                            className="w-full border rounded-xl p-3 mt-1"
+                            className="select-field mt-1"
                         >
                             <option value="">Select class</option>
                             {classes.map((c) => (
@@ -94,12 +94,12 @@ export default function BulkMarksUpload() {
                     <Input label="Max Marks" type="number" value={maxMarks} onChange={(e) => setMaxMarks(e.target.value)} />
 
                     <div>
-                        <label className="text-sm text-gray-600">CSV File</label>
+                        <label className="label">CSV File</label>
                         <input
                             type="file"
                             accept=".csv,.xlsx,.xls"
                             onChange={(e) => setFile(e.target.files?.[0])}
-                            className="w-full border rounded-xl p-3 mt-1"
+                            className="input-field mt-1"
                         />
 
                     </div>
@@ -116,18 +116,18 @@ export default function BulkMarksUpload() {
                 </div>
 
                 {report && (
-                    <div className="mt-4 bg-gray-50 border rounded-2xl p-4">
-                        <h3 className="font-bold mb-2">Upload Report</h3>
+                    <div className="mt-4 rounded-2xl border border-slate-200/70 bg-white/80 p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Upload Report</h3>
                         <p>Total Rows: <b>{report.total}</b></p>
-                        <p>Created/Updated: <b className="text-green-700">{report.created}</b></p>
-                        <p>Failed: <b className="text-red-700">{report.failed}</b></p>
+                        <p>Created/Updated: <b className="text-emerald-700">{report.created}</b></p>
+                        <p>Failed: <b className="text-rose-700">{report.failed}</b></p>
 
                         {report.errors?.length > 0 && (
                             <div className="mt-3">
-                                <p className="font-semibold mb-1">Failed Rows:</p>
-                                <div className="max-h-48 overflow-auto border rounded-xl bg-white">
+                                <p className="font-semibold text-slate-800 mb-1">Failed Rows:</p>
+                                <div className="max-h-48 overflow-auto border border-slate-200 rounded-xl bg-white">
                                     <table className="min-w-full text-left">
-                                        <thead className="bg-gray-100 border-b">
+                                        <thead className="bg-slate-50 border-b border-slate-200">
                                             <tr>
                                                 <th className="p-2 text-sm">Row</th>
                                                 <th className="p-2 text-sm">RollNo</th>

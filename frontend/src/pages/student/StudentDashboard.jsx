@@ -13,8 +13,33 @@ export default function StudentDashboard() {
   return (
     <Layout>
       <PageTitle title="Student Dashboard" subtitle="Profile overview" />
-      <div className="bg-white border rounded-2xl p-6 shadow">
-        <pre className="text-sm">{JSON.stringify(profile, null, 2)}</pre>
+      <div className="card p-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <p className="text-sm text-slate-500">Name</p>
+            <p className="text-lg font-semibold text-slate-900">{profile?.user?.name || "-"}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Email</p>
+            <p className="text-lg font-semibold text-slate-900">{profile?.user?.email || "-"}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Class</p>
+            <p className="text-lg font-semibold text-slate-900">{profile?.classId?.name || "-"}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Roll No</p>
+            <p className="text-lg font-semibold text-slate-900">{profile?.rollNo || "-"}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Phone</p>
+            <p className="text-lg font-semibold text-slate-900">{profile?.phone || "-"}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Address</p>
+            <p className="text-lg font-semibold text-slate-900">{profile?.address || "-"}</p>
+          </div>
+        </div>
       </div>
     </Layout>
   );
