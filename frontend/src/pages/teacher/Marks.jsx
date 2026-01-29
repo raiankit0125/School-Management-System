@@ -47,10 +47,10 @@ export default function Marks() {
     <Layout>
       <PageTitle title="Upload Marks" subtitle="Select class & upload marks" />
 
-      <div className="bg-white border rounded-2xl p-6 shadow mb-6 grid md:grid-cols-4 gap-4">
+      <div className="card p-6 mb-6 grid md:grid-cols-4 gap-4">
         <div>
-          <label className="text-sm text-gray-600">Class</label>
-          <select value={classId} onChange={(e) => setClassId(e.target.value)} className="w-full border rounded-xl p-3 mt-1">
+          <label className="label">Class</label>
+          <select value={classId} onChange={(e) => setClassId(e.target.value)} className="select-field mt-1">
             <option value="">Select class</option>
             {classes.map((c) => (
               <option key={c._id} value={c._id}>{c.name}</option>
@@ -66,19 +66,19 @@ export default function Marks() {
         </div>
       </div>
 
-      <div className="bg-white border rounded-2xl p-6 shadow">
-        <h3 className="font-bold mb-4">Marks</h3>
+      <div className="card p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Marks</h3>
 
         {students.map((s) => (
-          <div key={s._id} className="flex items-center justify-between border-b py-3 last:border-b-0">
+          <div key={s._id} className="flex items-center justify-between border-b border-slate-100 py-3 last:border-b-0">
             <div>
-              <p className="font-semibold">{s?.user?.name}</p>
-              <p className="text-sm text-gray-500">{s?.rollNo || ""}</p>
+              <p className="font-semibold text-slate-900">{s?.user?.name}</p>
+              <p className="text-sm text-slate-500">{s?.rollNo || ""}</p>
             </div>
 
             <input
               type="number"
-              className="border rounded-xl p-2 w-28"
+              className="input-field w-28"
               value={marksMap[s._id] ?? 0}
               onChange={(e) => setMarksMap({ ...marksMap, [s._id]: e.target.value })}
             />

@@ -31,16 +31,29 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="bg-white border rounded-2xl shadow p-8 w-full max-w-md">
-        <h2 className="text-xl font-bold">Change Password</h2>
-        <p className="text-gray-500 text-sm mt-1">
-          This is required on first login.
+    <div className="app-shell flex items-center justify-center px-4 py-10">
+      <div className="card w-full max-w-xl p-8 sm:p-10">
+        <p className="label text-teal-600/80">Security check</p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-900">Change password</h2>
+        <p className="text-slate-500 text-sm mt-2">
+          For security, update your password before continuing.
         </p>
 
         <div className="mt-6 space-y-4">
-          <Input label="Old Password" type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
-          <Input label="New Password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <Input
+            label="Old Password"
+            type="password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            autoComplete="current-password"
+          />
+          <Input
+            label="New Password"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            autoComplete="new-password"
+          />
 
           <Button className="w-full" onClick={handleChange} disabled={loading}>
             {loading ? "Updating..." : "Update Password"}
