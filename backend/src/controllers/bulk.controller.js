@@ -16,7 +16,7 @@ const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
 export const bulkUploadTeachers = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "CSV file required" });
+    if (!req.file) return res.status(400).json({ message: "File required" });
 
     const rows = await parseUploadedFile(req.file);
 
@@ -103,7 +103,7 @@ export const bulkUploadTeachers = async (req, res) => {
 
 export const bulkUploadStudents = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "CSV file required" });
+    if (!req.file) return res.status(400).json({ message: "File required" });
 
     const rows = await parseUploadedFile(req.file);
 
