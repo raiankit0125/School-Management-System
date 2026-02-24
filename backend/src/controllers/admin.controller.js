@@ -19,38 +19,42 @@ export const getDashboard = async (req, res) => {
 };
 
 export const createTeacher = async (req, res) => {
-  const { name, email, subject, phone } = req.body;
+  try {
+    const { name, email, subject, phone } = req.body;
 
-  const exists = await User.findOne({ email });
-  if (exists) return res.status(400).json({ message: "Teacher already exists" });
+    if (!name || !email) {
+      return res.status(400).json({ message: "name and email are required" });
+    }
 
-  const tempPassword = generatePassword(10);
+    const exists = await User.findOne({ email });
+    if (exists) {
+      return res.status(400).json({ message: "Teacher already exists" });
+    }
 
-  const user = await User.create({
-    name,
-    email,
-    password: tempPassword,
-    role: "TEACHER",
-    mustChangePassword: true,
-  });
+    const tempPassword = generatePassword(10);
 
-  const teacher = await Teacher.create({ user: user._id, subject, phone });
-
-  // ✅ send email
-  await sendMail({
-    to: email,
-    subject: "Your Teacher Account Credentials",
-    html: newAccountTemplate({
+    const user = await User.create({
       name,
-      role: "TEACHER",
       email,
-      tempPassword,
-    }),
-  });
+      password: tempPassword,
+      role: "TEACHER",
+      mustChangePassword: true,
+    });
 
-  return res.status(201).json(
-    new ApiResponse(201, { user, teacher }, "Teacher created & email sent ✅")
-  );
+    const teacher = await Teacher.create({
+      user: user._id,
+      subject: subject || "",
+      phone: phone || "",
+    });
+
+    return res
+      .status(201)
+      .json(new ApiResponse(201, { user, teacher }, "Teacher created successfully"));
+
+  } catch (error) {
+    console.error("Create Teacher Error:", error);
+    return res.status(500).json({ message: error.message || "Server error" });
+  }
 };
 
 export const getTeachers = async (req, res) => {
