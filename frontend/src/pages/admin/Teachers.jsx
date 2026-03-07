@@ -115,10 +115,14 @@ export default function Teachers() {
   };
 
   const createTeacher = async () => {
-    await axiosInstance.post("/admin/teacher", form);
-    resetForm();
-    fetchTeachers();
-    alert("Faculty added successfully");
+    try {
+      await axiosInstance.post("/admin/teacher", form);
+      resetForm();
+      fetchTeachers();
+      alert("Faculty added successfully");
+    } catch (err) {
+      alert(err?.response?.data?.message || "Failed to create faculty");
+    }
   };
 
   const startEdit = (teacher) => {
@@ -157,10 +161,14 @@ export default function Teachers() {
   };
 
   const updateTeacher = async () => {
-    await axiosInstance.put(`/admin/teacher/${editingId}`, form);
-    resetForm();
-    fetchTeachers();
-    alert("Faculty updated successfully");
+    try {
+      await axiosInstance.put(`/admin/teacher/${editingId}`, form);
+      resetForm();
+      fetchTeachers();
+      alert("Faculty updated successfully");
+    } catch (err) {
+      alert(err?.response?.data?.message || "Failed to update faculty");
+    }
   };
 
   const deleteTeacher = async (teacherId) => {

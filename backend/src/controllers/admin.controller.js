@@ -89,23 +89,25 @@ export const getDashboard = async (req, res) => {
 };
 
 export const createTeacher = async (req, res) => {
+  let user = null;
   try {
     const { name, email } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
-    if (!name || !email) {
+    if (!name || !normalizedEmail) {
       return res.status(400).json({ message: "name and email are required" });
     }
 
-    const exists = await User.findOne({ email });
+    const exists = await User.findOne({ email: normalizedEmail });
     if (exists) {
       return res.status(400).json({ message: "Teacher already exists" });
     }
 
     const tempPassword = generatePassword(10);
 
-    const user = await User.create({
+    user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password: tempPassword,
       role: "TEACHER",
       mustChangePassword: true,
@@ -119,8 +121,10 @@ export const createTeacher = async (req, res) => {
     return res
       .status(201)
       .json(new ApiResponse(201, { user, teacher }, "Teacher created successfully"));
-
   } catch (error) {
+    if (user?._id) {
+      await User.findByIdAndDelete(user._id).catch(() => {});
+    }
     console.error("Create Teacher Error:", error);
     return res.status(500).json({ message: error.message || "Server error" });
   }
@@ -158,53 +162,58 @@ export const updateTeacher = async (req, res) => {
 };
 
 export const createStudent = async (req, res) => {
-  const { name, email } = req.body;
+  let user = null;
+  try {
+    const { name, email } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
-  if (!name || !email) {
-    return res.status(400).json({ message: "name and email are required" });
-  }
+    if (!name || !normalizedEmail) {
+      return res.status(400).json({ message: "name and email are required" });
+    }
 
-  const exists = await User.findOne({ email });
-  if (exists) return res.status(400).json({ message: "Student already exists" });
+    const exists = await User.findOne({ email: normalizedEmail });
+    if (exists) return res.status(400).json({ message: "Student already exists" });
 
-  const tempPassword = generatePassword(10);
+    const tempPassword = generatePassword(10);
 
-  const user = await User.create({
-    name,
-    email,
-    password: tempPassword,
-    role: "STUDENT",
-    mustChangePassword: true,
-  });
-
-  const student = await Student.create({
-    user: user._id,
-    ...buildStudentPayload(req.body),
-  });
-
-  // ✅ send email
-try {
-  await sendMail({
-    to: email,
-    subject: "Your Student Account Credentials",
-    html: newAccountTemplate({
+    user = await User.create({
       name,
+      email: normalizedEmail,
+      password: tempPassword,
       role: "STUDENT",
-      email,
-      tempPassword,
-    }),
-  });
-  console.log("✅ Student mail sent:", email);
-} catch (error) {
-  console.log("❌ Student mail failed:", error.message);
+      mustChangePassword: true,
+    });
 
-  // ✅ IMPORTANT: Mail fail ho jaye to bhi student create hona chahiye
-  // So we are NOT throwing error
-}
+    const student = await Student.create({
+      user: user._id,
+      ...buildStudentPayload(req.body),
+    });
 
-  return res.status(201).json(
-    new ApiResponse(201, { user, student }, "Student created & email sent ✅")
-  );
+    try {
+      await sendMail({
+        to: normalizedEmail,
+        subject: "Your Student Account Credentials",
+        html: newAccountTemplate({
+          name,
+          role: "STUDENT",
+          email: normalizedEmail,
+          tempPassword,
+        }),
+      });
+      console.log("Student mail sent:", normalizedEmail);
+    } catch (error) {
+      console.log("Student mail failed:", error.message);
+    }
+
+    return res.status(201).json(
+      new ApiResponse(201, { user, student }, "Student created successfully")
+    );
+  } catch (error) {
+    if (user?._id) {
+      await User.findByIdAndDelete(user._id).catch(() => {});
+    }
+    return res.status(500).json({ message: error.message || "Server error" });
+  }
 };
 
 
