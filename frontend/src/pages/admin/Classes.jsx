@@ -73,7 +73,30 @@ export default function Classes() {
 
   return (
     <Layout>
-      <PageTitle title="Classes" subtitle="Create classes and assign faculty" />
+      <PageTitle title="Classes" subtitle="Create academic groups, assign faculty, and keep class ownership clear." />
+
+      <section className="hero-panel mb-6 bg-[linear-gradient(135deg,#fff7e9_0%,#e6f3ff_48%,#def6ef_100%)] p-6 lg:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,76,129,0.08),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(15,118,110,0.1),transparent_24%)]" />
+        <div className="relative grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
+            <p className="label text-sky-800/80">Academic Mapping</p>
+            <h3 className="mt-3 text-3xl font-semibold text-slate-900">Keep faculty allocation and academic groups structured.</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+              Admin defines class groups, maps faculty ownership, and keeps assignments searchable and editable from one place.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="metric-card">
+              <p className="label">Total Groups</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{classes.length}</p>
+            </div>
+            <div className="metric-card">
+              <p className="label">Assigned Faculty</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{classes.filter((item) => item?.teacher?._id).length}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="card p-6 mb-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">

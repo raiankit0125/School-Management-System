@@ -72,6 +72,28 @@ export default function BulkUpload() {
                 title="Bulk Upload"
                 subtitle="Upload CSV or Excel to create many students or faculty with full details"
             />
+            <section className="hero-panel mb-6 bg-[linear-gradient(135deg,#fef7eb_0%,#edf6ff_52%,#e8fbf4_100%)] p-6 lg:p-8">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,76,129,0.1),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(217,119,87,0.12),transparent_24%)]" />
+                <div className="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div>
+                        <p className="label text-sky-800/80">Bulk Operations</p>
+                        <h3 className="mt-3 text-3xl font-semibold text-slate-900">Import faculty and students with cleaner operational flow.</h3>
+                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+                            Download structured templates, upload completed files, and review row-wise validation reports without leaving the admin workspace.
+                        </p>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="metric-card">
+                            <p className="label">Upload Type</p>
+                            <p className="mt-3 text-2xl font-semibold text-slate-900 capitalize">{type}</p>
+                        </div>
+                        <div className="metric-card">
+                            <p className="label">Latest Report</p>
+                            <p className="mt-3 text-2xl font-semibold text-slate-900">{report ? `${report.created} created` : "Pending"}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <div className="card p-6 space-y-4">
                 <div className="grid md:grid-cols-3 gap-4">

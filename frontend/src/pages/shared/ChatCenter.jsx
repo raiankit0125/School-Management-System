@@ -51,6 +51,29 @@ export default function ChatCenter() {
         subtitle="Role-based communication for admin, faculty, and students."
       />
 
+      <section className="hero-panel mb-6 bg-[linear-gradient(135deg,#eef5ff_0%,#f2fbf8_46%,#fff3ea_100%)] p-6 lg:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(68,99,179,0.12),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(217,119,87,0.12),transparent_24%)]" />
+        <div className="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="label text-sky-800/80">Communication Center</p>
+            <h3 className="mt-3 text-3xl font-semibold text-slate-900">Keep academic conversations clear, direct, and role-aware.</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+              Admin, faculty, and students can continue contextual conversations here based on the permissions available to their role.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="metric-card">
+              <p className="label">Contacts</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{contacts.length}</p>
+            </div>
+            <div className="metric-card">
+              <p className="label">Active Thread</p>
+              <p className="mt-3 text-xl font-semibold text-slate-900">{activeContact?.name || "None selected"}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <section className="card p-4">
           <p className="label">Contacts</p>

@@ -37,7 +37,30 @@ export default function Attendance() {
 
   return (
     <Layout>
-      <PageTitle title="Mark Attendance" subtitle="Select class & mark attendance" />
+      <PageTitle title="Mark Attendance" subtitle="Handle daily attendance with class-wise control and a cleaner faculty workflow." />
+
+      <section className="hero-panel mb-6 bg-[linear-gradient(135deg,#f7fffb_0%,#e1f8f0_44%,#e5edff_100%)] p-6 lg:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,118,110,0.1),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(15,76,129,0.1),transparent_24%)]" />
+        <div className="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="label text-teal-800/80">Attendance Workflow</p>
+            <h3 className="mt-3 text-3xl font-semibold text-slate-900">Record attendance class-wise with fast daily updates.</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+              Select an assigned class, mark present or absent, and save one clean attendance sheet for the day.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="metric-card">
+              <p className="label">Assigned Groups</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{classes.length}</p>
+            </div>
+            <div className="metric-card">
+              <p className="label">Loaded Learners</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{students.length}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="card p-6 mb-6 grid md:grid-cols-3 gap-4">
         <div>

@@ -45,7 +45,30 @@ export default function Marks() {
 
   return (
     <Layout>
-      <PageTitle title="Upload Marks" subtitle="Select class & upload marks" />
+      <PageTitle title="Upload Marks" subtitle="Upload subject-wise marks with a faculty-first evaluation workflow." />
+
+      <section className="hero-panel mb-6 bg-[linear-gradient(135deg,#f7fbff_0%,#e1ecff_42%,#fff2e7_100%)] p-6 lg:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(68,99,179,0.14),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(217,119,87,0.12),transparent_24%)]" />
+        <div className="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="label text-sky-800/80">Assessment Upload</p>
+            <h3 className="mt-3 text-3xl font-semibold text-slate-900">Publish marks cleanly across assigned classes and subjects.</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+              Choose a class, set the subject and full marks, then enter student scores in one focused evaluation panel.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="metric-card">
+              <p className="label">Assigned Groups</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{classes.length}</p>
+            </div>
+            <div className="metric-card">
+              <p className="label">Loaded Learners</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{students.length}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="card p-6 mb-6 grid md:grid-cols-4 gap-4">
         <div>

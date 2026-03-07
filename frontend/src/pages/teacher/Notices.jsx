@@ -49,6 +49,25 @@ export default function Notices() {
       />
 
       <section className="card p-6">
+        <div className="mb-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="label text-teal-800/80">Notice Workflow</p>
+            <h3 className="mt-3 text-3xl font-semibold text-slate-900">Send focused academic notices to individual learners.</h3>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+              Choose the assigned group, pick a learner, and share academic instructions, reminders, or support messages from one controlled space.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="metric-card">
+              <p className="label">Assigned Groups</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{classes.length}</p>
+            </div>
+            <div className="metric-card">
+              <p className="label">Sent Notices</p>
+              <p className="mt-3 text-4xl font-semibold text-slate-900">{notices.length}</p>
+            </div>
+          </div>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="label">Academic Group</label>
