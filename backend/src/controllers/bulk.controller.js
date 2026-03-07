@@ -1,7 +1,7 @@
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { parseCsvBuffer } from "../utils/parseCsv.js";
 import { generatePassword } from "../utils/generatePassword.js";
-import { sendMail } from "../utils/sendMail.js";
+import { queueMail } from "../utils/sendMail.js";
 import { newAccountTemplate } from "../utils/emailTemplates.js";
 import { parseUploadedFile } from "../utils/parseFile.js";
 
@@ -18,6 +18,20 @@ const parseList = (s = "") =>
     .filter(Boolean);
 
 const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+
+const queueBulkCredentialMail = ({ name, role, email, tempPassword }) => {
+  queueMail({
+    to: email,
+    subject: `Your ${role} Account Credentials`,
+    html: newAccountTemplate({
+      name,
+      role,
+      email,
+      tempPassword,
+    }),
+    label: `${role} bulk`,
+  });
+};
 
 export const bulkUploadTeachers = async (req, res) => {
   try {
@@ -136,22 +150,12 @@ export const bulkUploadTeachers = async (req, res) => {
         declarationDate: declarationDate || null,
       });
 
-      // email (do not fail whole import)
-      try {
-        await sendMail({
-          to: email,
-          subject: "Your Teacher Account Credentials",
-          html: newAccountTemplate({
-            name,
-            role: "TEACHER",
-            email,
-            tempPassword,
-          }),
-        });
-      } catch (err) {
-        // don't break bulk upload
-        console.log("❌ Teacher mail failed:", email, err.message);
-      }
+      queueBulkCredentialMail({
+        name,
+        role: "TEACHER",
+        email,
+        tempPassword,
+      });
 
       created++;
     }
@@ -254,21 +258,12 @@ export const bulkUploadStudents = async (req, res) => {
         notes,
       });
 
-      // email
-      try {
-        await sendMail({
-          to: email,
-          subject: "Your Student Account Credentials",
-          html: newAccountTemplate({
-            name,
-            role: "STUDENT",
-            email,
-            tempPassword,
-          }),
-        });
-      } catch (err) {
-        console.log("❌ Student mail failed:", email, err.message);
-      }
+      queueBulkCredentialMail({
+        name,
+        role: "STUDENT",
+        email,
+        tempPassword,
+      });
 
       created++;
     }

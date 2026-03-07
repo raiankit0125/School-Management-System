@@ -6,7 +6,7 @@ import { Attendance } from "../models/Attendance.model.js";
 import { Mark } from "../models/Mark.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { generatePassword } from "../utils/generatePassword.js";
-import { sendMail } from "../utils/sendMail.js";
+import { queueMail, sendMail } from "../utils/sendMail.js";
 import { newAccountTemplate } from "../utils/emailTemplates.js";
 
 const normalizeList = (value) => {
@@ -80,6 +80,20 @@ const buildStudentPayload = (body = {}) => ({
   notes: body.notes || "",
 });
 
+const queueAccountCredentialsMail = ({ name, role, email, tempPassword }) => {
+  queueMail({
+    to: email,
+    subject: `Your ${role} Account Credentials`,
+    html: newAccountTemplate({
+      name,
+      role,
+      email,
+      tempPassword,
+    }),
+    label: role,
+  });
+};
+
 export const getDashboard = async (req, res) => {
   const totalTeachers = await User.countDocuments({ role: "TEACHER" });
   const totalStudents = await User.countDocuments({ role: "STUDENT" });
@@ -118,9 +132,22 @@ export const createTeacher = async (req, res) => {
       ...buildFacultyPayload(req.body),
     });
 
+    queueAccountCredentialsMail({
+      name,
+      role: "TEACHER",
+      email: normalizedEmail,
+      tempPassword,
+    });
+
     return res
       .status(201)
-      .json(new ApiResponse(201, { user, teacher }, "Teacher created successfully"));
+      .json(
+        new ApiResponse(
+          201,
+          { user, teacher },
+          "Teacher created successfully. Credentials email queued."
+        )
+      );
   } catch (error) {
     if (user?._id) {
       await User.findByIdAndDelete(user._id).catch(() => {});
@@ -189,24 +216,19 @@ export const createStudent = async (req, res) => {
       ...buildStudentPayload(req.body),
     });
 
-    try {
-      await sendMail({
-        to: normalizedEmail,
-        subject: "Your Student Account Credentials",
-        html: newAccountTemplate({
-          name,
-          role: "STUDENT",
-          email: normalizedEmail,
-          tempPassword,
-        }),
-      });
-      console.log("Student mail sent:", normalizedEmail);
-    } catch (error) {
-      console.log("Student mail failed:", error.message);
-    }
+    queueAccountCredentialsMail({
+      name,
+      role: "STUDENT",
+      email: normalizedEmail,
+      tempPassword,
+    });
 
     return res.status(201).json(
-      new ApiResponse(201, { user, student }, "Student created successfully")
+      new ApiResponse(
+        201,
+        { user, student },
+        "Student created successfully. Credentials email queued."
+      )
     );
   } catch (error) {
     if (user?._id) {
@@ -224,13 +246,11 @@ export const resendCredentials = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // ✅ new temporary password generate
     const tempPassword = generatePassword(10);
     user.password = tempPassword;
     user.mustChangePassword = true;
     await user.save();
 
-    // ✅ send mail again
     await sendMail({
       to: user.email,
       subject: `Your ${user.role} Account Credentials`,
@@ -242,7 +262,7 @@ export const resendCredentials = async (req, res) => {
       }),
     });
 
-    return res.json(new ApiResponse(200, null, "Credentials resent ✅"));
+    return res.json(new ApiResponse(200, null, "Credentials resent"));
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
