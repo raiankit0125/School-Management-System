@@ -12,23 +12,42 @@ import chatRoutes from "./routes/chat.routes.js";
 
 const app = express();
 
+const configuredOrigins = [
+  process.env.FRONTEND_URL || "",
+  process.env.CORS_ORIGIN || "",
+]
+  .join(",")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  ...(process.env.FRONTEND_URL || "")
-    .split(",")
-    .map((o) => o.trim())
-    .filter(Boolean),
+  ...configuredOrigins,
 ];
+
+const allowedOriginPatterns = [
+  /^https:\/\/.*\.vercel\.app$/,
+];
+
+const isAllowedOrigin = (origin) => {
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+
+  return allowedOriginPatterns.some((pattern) => pattern.test(origin));
+};
 
 app.use(
   cors({
     origin(origin, cb) {
       if (!origin) return cb(null, true);
-      if (allowedOrigins.includes(origin)) return cb(null, true);
+      if (isAllowedOrigin(origin)) return cb(null, true);
       return cb(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,
+    optionsSuccessStatus: 200,
   })
 );
 
