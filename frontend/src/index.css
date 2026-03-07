@@ -42,6 +42,7 @@
       radial-gradient(circle at 92% 8%, rgba(253, 231, 216, 0.92), transparent 30%),
       radial-gradient(circle at 82% 82%, rgba(210, 244, 234, 0.9), transparent 26%),
       linear-gradient(180deg, #fbfaf7 0%, #f5efe6 100%);
+    background-attachment: fixed;
   }
 
   .app-shell-admin {
@@ -72,8 +73,27 @@
     animation: float-card 6s ease-in-out infinite;
   }
 
+  .workspace-backdrop {
+    @apply pointer-events-none fixed inset-0 -z-10 overflow-hidden;
+  }
+
+  .workspace-backdrop-image {
+    @apply absolute inset-0 bg-cover bg-center bg-no-repeat;
+    filter: saturate(1.05) contrast(1.02);
+    transform: scale(1.04);
+  }
+
+  .workspace-backdrop-tint {
+    @apply absolute inset-0;
+    background:
+      linear-gradient(180deg, rgba(8, 15, 28, 0.66) 0%, rgba(11, 20, 33, 0.52) 38%, rgba(13, 21, 35, 0.42) 100%),
+      radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 28%),
+      radial-gradient(circle at top right, rgba(15, 76, 129, 0.2), transparent 30%),
+      radial-gradient(circle at bottom right, rgba(217, 119, 87, 0.18), transparent 28%);
+  }
+
   .card {
-    @apply rounded-[28px] border border-white/70 bg-white/85 shadow-[0_22px_60px_-34px_rgba(15,23,42,0.38)] backdrop-blur;
+    @apply rounded-[28px] border border-white/25 bg-white/80 shadow-[0_22px_60px_-34px_rgba(15,23,42,0.38)] backdrop-blur;
   }
 
   .card-solid {
@@ -81,7 +101,7 @@
   }
 
   .glass-panel {
-    @apply rounded-[30px] border border-white/70 bg-white/70 backdrop-blur-xl shadow-[0_24px_70px_-40px_rgba(15,23,42,0.42)];
+    @apply rounded-[30px] border border-white/25 bg-white/20 backdrop-blur-xl shadow-[0_24px_70px_-40px_rgba(15,23,42,0.42)];
   }
 
   .hero-panel {
@@ -125,7 +145,7 @@
   }
 
   .metric-card {
-    @apply rounded-[26px] border border-white/70 bg-white/80 p-5 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.35)] backdrop-blur;
+    @apply rounded-[26px] border border-white/25 bg-white/80 p-5 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.35)] backdrop-blur;
   }
 
   .sidebar-link {
@@ -137,7 +157,7 @@
   }
 
   .sidebar-link-idle {
-    @apply text-slate-700 hover:bg-white/80;
+    @apply text-white/80 hover:bg-white/10;
   }
 }
 

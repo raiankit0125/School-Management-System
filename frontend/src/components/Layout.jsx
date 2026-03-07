@@ -20,6 +20,13 @@ export default function Layout({ children }) {
       ? "from-[#0f766e] via-[#0f5f8c] to-[#d97757]"
       : "from-[#0f5f8c] via-[#4463b3] to-[#d97757]";
 
+  const backgroundImage =
+    user?.role === "ADMIN"
+      ? "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1800&q=80"
+      : user?.role === "TEACHER"
+      ? "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1800&q=80"
+      : "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1800&q=80";
+
   const links =
     user?.role === "ADMIN"
       ? [
@@ -50,19 +57,26 @@ export default function Layout({ children }) {
         ];
 
   return (
-    <div className={`app-shell ${shellClass} flex`}>
+    <div className={`app-shell ${shellClass} relative flex`}>
+      <div className="workspace-backdrop">
+        <div
+          className="workspace-backdrop-image"
+          style={{ backgroundImage: `url(${backgroundImage})` }}
+        />
+        <div className="workspace-backdrop-tint" />
+      </div>
       {/* Sidebar */}
-      <aside className="hidden w-80 flex-col gap-8 border-r border-white/60 bg-white/55 p-5 shadow-[10px_0_45px_-34px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:flex">
+      <aside className="relative hidden w-80 flex-col gap-8 border-r border-white/20 bg-slate-950/30 p-5 shadow-[10px_0_45px_-34px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:flex">
         <div className={`rounded-[28px] bg-gradient-to-br ${roleAccent} p-6 text-white shadow-xl`}>
           <p className="text-xs uppercase tracking-widest text-white/70">Portal</p>
           <h2 className="mt-2 text-3xl font-semibold">Academic Hub</h2>
           <p className="mt-2 text-sm text-white/80">Built for schools, colleges, and modern academic teams</p>
           <div className="mt-5 grid grid-cols-2 gap-3 text-xs text-white/90">
-            <div className="rounded-2xl bg-white/12 px-3 py-3">
+            <div className="rounded-2xl bg-white/10 px-3 py-3">
               <p className="uppercase tracking-[0.2em] text-white/60">Role</p>
               <p className="mt-2 text-sm font-semibold">{user?.role}</p>
             </div>
-            <div className="rounded-2xl bg-white/12 px-3 py-3">
+            <div className="rounded-2xl bg-white/10 px-3 py-3">
               <p className="uppercase tracking-[0.2em] text-white/60">Status</p>
               <p className="mt-2 text-sm font-semibold">Active Session</p>
             </div>
@@ -87,20 +101,20 @@ export default function Layout({ children }) {
           ))}
         </nav>
 
-        <div className="mt-auto rounded-[26px] border border-white/70 bg-white/75 p-5 shadow-[0_20px_45px_-36px_rgba(15,23,42,0.36)]">
+        <div className="mt-auto rounded-[26px] border border-white/25 bg-white/10 p-5 text-white shadow-[0_20px_45px_-36px_rgba(15,23,42,0.36)] backdrop-blur">
           <p className="text-xs text-slate-500">Signed in as</p>
-          <p className="mt-1 text-base font-semibold text-slate-800">{user?.name}</p>
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{user?.role}</p>
+          <p className="mt-1 text-base font-semibold text-white">{user?.name}</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-white/70">{user?.role}</p>
         </div>
       </aside>
 
       {/* Main */}
-      <div className="flex-1">
+      <div className="relative flex-1">
         {/* Navbar */}
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/60 bg-white/45 px-6 py-4 backdrop-blur-xl">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/20 bg-slate-950/30 px-6 py-4 backdrop-blur-xl">
           <div>
-            <h1 className="text-lg font-semibold text-slate-900">{user?.role} Workspace</h1>
-            <p className="text-sm text-slate-500">{user?.name}</p>
+            <h1 className="text-lg font-semibold text-white">{user?.role} Workspace</h1>
+            <p className="text-sm text-white/70">{user?.name}</p>
           </div>
 
           <Button
@@ -116,7 +130,7 @@ export default function Layout({ children }) {
 
         <main className="p-5 lg:p-8">
           {children}
-          <footer className="mt-10 rounded-[30px] border border-white/70 bg-white/70 px-6 py-6 text-sm text-slate-600 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
+          <footer className="mt-10 rounded-[30px] border border-white/20 bg-slate-950/30 px-6 py-6 text-sm text-white/80 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <p>Academic Hub supports faculty operations, student progress, attendance, notices, and communication.</p>
               <p>Designed for school and college workflows.</p>
