@@ -27,6 +27,25 @@ export default function Layout({ children }) {
       ? "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1800&q=80"
       : "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1800&q=80";
 
+  const roleVisual =
+    user?.role === "ADMIN"
+      ? {
+          label: "Operations Studio",
+          copy: "Admissions, assignments, and communication in one view.",
+          image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80",
+        }
+      : user?.role === "TEACHER"
+      ? {
+          label: "Faculty Flow",
+          copy: "Teaching tools, attendance, and learner communication.",
+          image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=900&q=80",
+        }
+      : {
+          label: "Learner Space",
+          copy: "Progress, notices, and academic support in one place.",
+          image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
+        };
+
   const links =
     user?.role === "ADMIN"
       ? [
@@ -66,7 +85,7 @@ export default function Layout({ children }) {
         <div className="workspace-backdrop-tint" />
       </div>
       {/* Sidebar */}
-      <aside className="relative hidden w-80 flex-col gap-8 border-r border-white/20 bg-slate-950/30 p-5 shadow-[10px_0_45px_-34px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:flex">
+      <aside className="relative hidden w-80 flex-col gap-8 border-r border-white/20 bg-slate-950/40 p-5 shadow-[10px_0_45px_-34px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:flex">
         <div className={`rounded-[28px] bg-gradient-to-br ${roleAccent} p-6 text-white shadow-xl`}>
           <p className="text-xs uppercase tracking-widest text-white/70">Portal</p>
           <h2 className="mt-2 text-3xl font-semibold">Academic Hub</h2>
@@ -101,8 +120,16 @@ export default function Layout({ children }) {
           ))}
         </nav>
 
+        <div className="role-visual-card float-card [animation-duration:7.5s]">
+          <img src={roleVisual.image} alt={roleVisual.label} className="h-36 w-full rounded-[22px] object-cover" />
+          <div className="mt-4">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-white/60">{roleVisual.label}</p>
+            <p className="mt-2 text-sm leading-6 text-white/80">{roleVisual.copy}</p>
+          </div>
+        </div>
+
         <div className="mt-auto rounded-[26px] border border-white/25 bg-white/10 p-5 text-white shadow-[0_20px_45px_-36px_rgba(15,23,42,0.36)] backdrop-blur">
-          <p className="text-xs text-slate-500">Signed in as</p>
+          <p className="text-xs text-white/55">Signed in as</p>
           <p className="mt-1 text-base font-semibold text-white">{user?.name}</p>
           <p className="text-xs uppercase tracking-[0.24em] text-white/70">{user?.role}</p>
         </div>
@@ -111,10 +138,18 @@ export default function Layout({ children }) {
       {/* Main */}
       <div className="relative flex-1">
         {/* Navbar */}
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/20 bg-slate-950/30 px-6 py-4 backdrop-blur-xl">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/45 bg-white/70 px-6 py-4 backdrop-blur-xl">
           <div>
-            <h1 className="text-lg font-semibold text-white">{user?.role} Workspace</h1>
-            <p className="text-sm text-white/70">{user?.name}</p>
+            <h1 className="text-lg font-semibold text-slate-900">{user?.role} Workspace</h1>
+            <p className="text-sm text-slate-600">{user?.name}</p>
+          </div>
+
+          <div className="hidden items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/75 px-3 py-2 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.4)] md:flex">
+            <img src={roleVisual.image} alt={roleVisual.label} className="h-11 w-11 rounded-2xl object-cover" />
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{roleVisual.label}</p>
+              <p className="text-sm font-semibold text-slate-800">{user?.role}</p>
+            </div>
           </div>
 
           <Button
@@ -129,8 +164,10 @@ export default function Layout({ children }) {
         </header>
 
         <main className="p-5 lg:p-8">
-          {children}
-          <footer className="mt-10 rounded-[30px] border border-white/20 bg-slate-950/30 px-6 py-6 text-sm text-white/80 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
+          <div className="content-stage">
+            {children}
+          </div>
+          <footer className="mt-10 rounded-[30px] border border-white/60 bg-white/80 px-6 py-6 text-sm text-slate-700 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <p>Academic Hub supports faculty operations, student progress, attendance, notices, and communication.</p>
               <p>Designed for school and college workflows.</p>

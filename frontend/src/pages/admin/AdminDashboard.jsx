@@ -47,22 +47,22 @@ export default function AdminDashboard() {
             <h2 className="mt-3 max-w-2xl text-4xl font-semibold leading-tight">
               Control admissions, faculty enablement, progress tracking, and communication from one dashboard.
             </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/82">
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80">
               Admin sets up faculty, assigns classes, manages student records, and activates the workflows that faculty and students use after password reset.
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="float-card rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur">
-              <p className="text-xs uppercase tracking-wider text-white/65">Faculty</p>
+              <p className="text-xs uppercase tracking-wider text-white/70">Faculty</p>
               <p className="mt-3 text-4xl font-semibold">{stats?.totalTeachers ?? 0}</p>
             </div>
             <div className="float-card rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur [animation-delay:0.6s]">
-              <p className="text-xs uppercase tracking-wider text-white/65">Students</p>
+              <p className="text-xs uppercase tracking-wider text-white/70">Students</p>
               <p className="mt-3 text-4xl font-semibold">{stats?.totalStudents ?? 0}</p>
             </div>
             <div className="float-card rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur [animation-delay:1.2s]">
-              <p className="text-xs uppercase tracking-wider text-white/65">Groups</p>
+              <p className="text-xs uppercase tracking-wider text-white/70">Groups</p>
               <p className="mt-3 text-4xl font-semibold">{stats?.totalClasses ?? 0}</p>
             </div>
           </div>

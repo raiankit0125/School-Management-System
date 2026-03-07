@@ -79,8 +79,9 @@
 
   .workspace-backdrop-image {
     @apply absolute inset-0 bg-cover bg-center bg-no-repeat;
-    filter: saturate(1.05) contrast(1.02);
+    filter: saturate(1.04) contrast(1.03);
     transform: scale(1.04);
+    animation: slow-pan 26s ease-in-out infinite alternate;
   }
 
   .workspace-backdrop-tint {
@@ -90,6 +91,10 @@
       radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 28%),
       radial-gradient(circle at top right, rgba(15, 76, 129, 0.2), transparent 30%),
       radial-gradient(circle at bottom right, rgba(217, 119, 87, 0.18), transparent 28%);
+  }
+
+  .content-stage {
+    @apply rounded-[34px] border border-white/30 bg-white/10 p-3 backdrop-blur-[2px];
   }
 
   .card {
@@ -153,11 +158,15 @@
   }
 
   .sidebar-link-active {
-    @apply bg-slate-900 text-white shadow-lg shadow-slate-900/20;
+    @apply bg-white/20 text-white shadow-lg shadow-slate-900/20;
   }
 
   .sidebar-link-idle {
     @apply text-white/80 hover:bg-white/10;
+  }
+
+  .role-visual-card {
+    @apply rounded-[28px] border border-white/20 bg-white/10 p-4 shadow-[0_22px_50px_-36px_rgba(15,23,42,0.4)] backdrop-blur;
   }
 }
 
@@ -167,5 +176,14 @@
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+@keyframes slow-pan {
+  0% {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.09) translate3d(-1.2%, -1.2%, 0);
   }
 }

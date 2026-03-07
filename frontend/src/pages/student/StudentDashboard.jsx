@@ -36,7 +36,7 @@ export default function StudentDashboard() {
             <h2 className="mt-3 text-4xl font-semibold leading-tight">
               See your progress clearly and reach your faculty whenever you need help.
             </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/82">
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80">
               Students can only view their attendance and marks, receive notices, and message faculty for academic doubts.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
