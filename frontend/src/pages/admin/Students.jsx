@@ -74,7 +74,13 @@ export default function Students() {
       fetchData();
       alert("Student added successfully");
     } catch (err) {
-      alert(err?.response?.data?.message || "Failed to create student");
+      const message = err?.response?.data?.message || "Failed to create student";
+      if (message === "Student already exists") {
+        setSearch(form.email || form.name || "");
+        alert("A student with this email already exists. Search below and edit the existing record.");
+        return;
+      }
+      alert(message);
     }
   };
 

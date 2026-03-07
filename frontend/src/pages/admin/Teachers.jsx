@@ -121,7 +121,13 @@ export default function Teachers() {
       fetchTeachers();
       alert("Faculty added successfully");
     } catch (err) {
-      alert(err?.response?.data?.message || "Failed to create faculty");
+      const message = err?.response?.data?.message || "Failed to create faculty";
+      if (message === "Teacher already exists") {
+        setSearch(form.email || form.name || "");
+        alert("A faculty account with this email already exists. Search below and edit the existing record.");
+        return;
+      }
+      alert(message);
     }
   };
 
