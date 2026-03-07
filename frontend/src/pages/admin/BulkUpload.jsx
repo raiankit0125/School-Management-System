@@ -23,18 +23,18 @@ export default function BulkUpload() {
     const [report, setReport] = useState(null);
 
     const studentTemplate =
-        "name,email,className,rollNo,phone,address\n" +
-        "Rahul Kumar,rahul@gmail.com,10-A,12,9876543210,Noida\n" +
-        "Ankit Sharma,ankit@gmail.com,10-A,13,9999999999,Ghaziabad\n";
+        "name,email,className,rollNo,phone,address,dob,gender,city,state,pincode,guardianName,guardianPhone,admissionNo,section,previousSchool,medicalNotes,transportMode,notes\n" +
+        "Rahul Kumar,rahul@gmail.com,10-A,12,9876543210,Noida,2011-05-10,Male,Noida,UP,201301,Rakesh Kumar,9876500000,ADM-1001,A,City Public School,None,Bus,Merit student\n" +
+        "Ankit Sharma,ankit@gmail.com,10-A,13,9999999999,Ghaziabad,2011-08-20,Male,Ghaziabad,UP,201010,Sunita Sharma,9811100000,ADM-1002,A,Bright Future School,Allergy alert,Van,Needs scholarship review\n";
 
     const teacherTemplate =
-        "name,email,subject,phone\n" +
-        "Mr Raj,raj@gmail.com,Math,9000000000\n" +
-        "Ms Neha,neha@gmail.com,Science,9111111111\n";
+        "name,email,subject,phone,alternatePhone,dob,gender,address,city,state,pincode,qualification,specialization,certifications,certificates,subjects,preferredClasses,experienceYears,designation,institutions,onlineExperience,onlineExperienceDetails,preferredTimings,timeSlots,hoursPerWeek,devices,internetOptions,techRating,demoReady,demoTopic,whyBst,comments,declarationAccepted,signature,declarationDate\n" +
+        "Mr Raj,raj@gmail.com,Mathematics,9000000000,9000000001,1990-04-15,Male,Delhi NCR,Noida,UP,201301,M.Sc,Algebra,TET Certified,,Mathematics|Physics,Class IX|Class X,8,Senior Faculty,City School,Yes,Zoom and Meet batches,Morning|Evening,6:00 PM - 8:00 PM,20,Laptop / Desktop|Tablet,Wi-Fi|Broadband,5,Yes,Quadratic Equations,Looking for strong academic culture,Available immediately,true,Raj Kumar,2026-03-07\n" +
+        "Ms Neha,neha@gmail.com,Science,9111111111,9111111112,1992-09-11,Female,Ghaziabad,Ghaziabad,UP,201010,B.Ed,Biology,CTET,,Biology|Science,Class VI|Class VIII,5,Faculty,Bright School,Yes,Handled online science lab demos,Afternoon|Evening,4:00 PM - 7:00 PM,18,Laptop / Desktop|Smartphone,Wi-Fi|Mobile Data,4,Yes,Cell Structure,Interested in blended teaching,Part time support,true,Neha Sharma,2026-03-07\n";
 
     const downloadTemplate = () => {
         if (type === "students") downloadCSV("students_template.csv", studentTemplate);
-        else downloadCSV("teachers_template.csv", teacherTemplate);
+        else downloadCSV("faculty_template.csv", teacherTemplate);
     };
 
     const uploadFile = async () => {
@@ -70,7 +70,7 @@ export default function BulkUpload() {
         <Layout>
             <PageTitle
                 title="Bulk Upload"
-                subtitle="Upload CSV to create many Students/Teachers automatically"
+                subtitle="Upload CSV or Excel to create many students or faculty with full details"
             />
 
             <div className="card p-6 space-y-4">
@@ -83,7 +83,7 @@ export default function BulkUpload() {
                             className="select-field mt-1"
                         >
                             <option value="students">Students</option>
-                            <option value="teachers">Teachers</option>
+                            <option value="teachers">Faculty</option>
                         </select>
                     </div>
 

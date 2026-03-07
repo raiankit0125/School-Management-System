@@ -10,7 +10,7 @@ export default function Layout({ children }) {
     user?.role === "ADMIN"
       ? [
           { name: "Dashboard", to: "/admin" },
-          { name: "Teachers", to: "/admin/teachers" },
+          { name: "Faculty", to: "/admin/teachers" },
           { name: "Students", to: "/admin/students" },
           { name: "Bulk Upload", to: "/admin/bulk-upload" },
           { name: "Classes", to: "/admin/classes" },

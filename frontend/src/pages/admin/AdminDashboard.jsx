@@ -22,7 +22,7 @@ export default function AdminDashboard() {
       <PageTitle title="Admin Dashboard" subtitle="Overview of school data" />
 
       <div className="grid md:grid-cols-3 gap-6">
-        <Card title="Total Teachers" value={stats?.totalTeachers ?? 0} />
+        <Card title="Total Faculty" value={stats?.totalTeachers ?? 0} />
         <Card title="Total Students" value={stats?.totalStudents ?? 0} />
         <Card title="Total Classes" value={stats?.totalClasses ?? 0} />
       </div>

@@ -73,7 +73,7 @@ export default function Classes() {
 
   return (
     <Layout>
-      <PageTitle title="Classes" subtitle="Create classes & assign teacher" />
+      <PageTitle title="Classes" subtitle="Create classes and assign faculty" />
 
       <div className="card p-6 mb-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">
@@ -84,13 +84,13 @@ export default function Classes() {
           <Input label="Class Name (e.g. 10-A)" value={name} onChange={(e) => setName(e.target.value)} />
 
           <div>
-            <label className="label">Assign Teacher</label>
+            <label className="label">Assign Faculty</label>
             <select
               value={teacherId}
               onChange={(e) => setTeacherId(e.target.value)}
               className="select-field mt-1"
             >
-              <option value="">Select teacher</option>
+              <option value="">Select faculty</option>
               {teachers.map((t) => (
                 <option key={t._id} value={t._id}>
                   {t?.user?.name}
@@ -115,7 +115,7 @@ export default function Classes() {
       <div className="card p-4 mb-4">
         <Input
           label="Search"
-          placeholder="Search by class or teacher name"
+          placeholder="Search by class or faculty name"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -124,7 +124,7 @@ export default function Classes() {
       <Table
         columns={[
           { key: "name", title: "Class Name", render: (c) => c.name },
-          { key: "teacher", title: "Teacher", render: (c) => c?.teacher?.user?.name || "Not assigned" },
+          { key: "teacher", title: "Faculty", render: (c) => c?.teacher?.user?.name || "Not assigned" },
           {
             key: "actions",
             title: "Actions",

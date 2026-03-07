@@ -9,6 +9,76 @@ import { generatePassword } from "../utils/generatePassword.js";
 import { sendMail } from "../utils/sendMail.js";
 import { newAccountTemplate } from "../utils/emailTemplates.js";
 
+const normalizeList = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
+const buildFacultyPayload = (body = {}) => ({
+  subject: body.subject || "",
+  phone: body.phone || "",
+  alternatePhone: body.alternatePhone || "",
+  dob: body.dob || null,
+  gender: body.gender || "",
+  address: body.address || "",
+  city: body.city || "",
+  state: body.state || "",
+  pincode: body.pincode || "",
+  qualification: body.qualification || "",
+  specialization: body.specialization || "",
+  certifications: body.certifications || "",
+  certificates: body.certificates || "",
+  subjects: normalizeList(body.subjects),
+  preferredClasses: normalizeList(body.preferredClasses),
+  experienceYears: body.experienceYears || "",
+  designation: body.designation || "",
+  institutions: body.institutions || "",
+  onlineExperience: body.onlineExperience || "",
+  onlineExperienceDetails: body.onlineExperienceDetails || "",
+  preferredTimings: normalizeList(body.preferredTimings),
+  timeSlots: body.timeSlots || "",
+  hoursPerWeek: body.hoursPerWeek || "",
+  devices: normalizeList(body.devices),
+  internetOptions: normalizeList(body.internetOptions),
+  techRating: body.techRating || "",
+  demoReady: body.demoReady || "",
+  demoTopic: body.demoTopic || "",
+  whyBst: body.whyBst || "",
+  comments: body.comments || "",
+  declarationAccepted: Boolean(body.declarationAccepted),
+  signature: body.signature || "",
+  declarationDate: body.declarationDate || null,
+});
+
+const buildStudentPayload = (body = {}) => ({
+  classId: body.classId || null,
+  rollNo: body.rollNo || "",
+  phone: body.phone || "",
+  address: body.address || "",
+  dob: body.dob || null,
+  gender: body.gender || "",
+  city: body.city || "",
+  state: body.state || "",
+  pincode: body.pincode || "",
+  guardianName: body.guardianName || "",
+  guardianPhone: body.guardianPhone || "",
+  admissionNo: body.admissionNo || "",
+  section: body.section || "",
+  previousSchool: body.previousSchool || "",
+  medicalNotes: body.medicalNotes || "",
+  transportMode: body.transportMode || "",
+  notes: body.notes || "",
+});
 
 export const getDashboard = async (req, res) => {
   const totalTeachers = await User.countDocuments({ role: "TEACHER" });
@@ -20,7 +90,7 @@ export const getDashboard = async (req, res) => {
 
 export const createTeacher = async (req, res) => {
   try {
-    const { name, email, subject, phone } = req.body;
+    const { name, email } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ message: "name and email are required" });
@@ -43,8 +113,7 @@ export const createTeacher = async (req, res) => {
 
     const teacher = await Teacher.create({
       user: user._id,
-      subject: subject || "",
-      phone: phone || "",
+      ...buildFacultyPayload(req.body),
     });
 
     return res
@@ -65,7 +134,7 @@ export const getTeachers = async (req, res) => {
 export const updateTeacher = async (req, res) => {
   try {
     const { teacherId } = req.params;
-    const { name, email, subject, phone } = req.body;
+    const { name, email } = req.body;
 
     const teacher = await Teacher.findById(teacherId).populate("user");
     if (!teacher) return res.status(404).json({ message: "Teacher not found" });
@@ -79,8 +148,7 @@ export const updateTeacher = async (req, res) => {
     if (email) teacher.user.email = email;
     await teacher.user.save();
 
-    if (subject !== undefined) teacher.subject = subject;
-    if (phone !== undefined) teacher.phone = phone;
+    Object.assign(teacher, buildFacultyPayload(req.body));
     await teacher.save();
 
     return res.json(new ApiResponse(200, teacher, "Teacher updated"));
@@ -90,7 +158,11 @@ export const updateTeacher = async (req, res) => {
 };
 
 export const createStudent = async (req, res) => {
-  const { name, email, classId, rollNo, phone, address } = req.body;
+  const { name, email } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({ message: "name and email are required" });
+  }
 
   const exists = await User.findOne({ email });
   if (exists) return res.status(400).json({ message: "Student already exists" });
@@ -107,10 +179,7 @@ export const createStudent = async (req, res) => {
 
   const student = await Student.create({
     user: user._id,
-    classId,
-    rollNo,
-    phone,
-    address,
+    ...buildStudentPayload(req.body),
   });
 
   // ✅ send email
@@ -181,7 +250,7 @@ export const getStudents = async (req, res) => {
 export const updateStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
-    const { name, email, classId, rollNo, phone, address } = req.body;
+    const { name, email } = req.body;
 
     const student = await Student.findById(studentId).populate("user");
     if (!student) return res.status(404).json({ message: "Student not found" });
@@ -195,10 +264,7 @@ export const updateStudent = async (req, res) => {
     if (email) student.user.email = email;
     await student.user.save();
 
-    if (classId !== undefined) student.classId = classId || null;
-    if (rollNo !== undefined) student.rollNo = rollNo;
-    if (phone !== undefined) student.phone = phone;
-    if (address !== undefined) student.address = address;
+    Object.assign(student, buildStudentPayload(req.body));
     await student.save();
 
     return res.json(new ApiResponse(200, student, "Student updated"));
