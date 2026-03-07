@@ -94,6 +94,28 @@ const queueAccountCredentialsMail = ({ name, role, email, tempPassword }) => {
   });
 };
 
+const getMailFailureMessage = (error) => {
+  const message = String(error?.message || "").toLowerCase();
+
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return "SMTP is not configured on the server";
+  }
+
+  if (message.includes("invalid login") || message.includes("authentication")) {
+    return "SMTP login failed. Check SMTP_USER and SMTP_PASS";
+  }
+
+  if (message.includes("missing credentials")) {
+    return "SMTP credentials are missing on the server";
+  }
+
+  if (message.includes("timeout") || message.includes("etimedout")) {
+    return "Mail server timeout. Try again in a moment";
+  }
+
+  return error?.message || "Unable to send reset email";
+};
+
 export const getDashboard = async (req, res) => {
   const totalTeachers = await User.countDocuments({ role: "TEACHER" });
   const totalStudents = await User.countDocuments({ role: "STUDENT" });
@@ -246,21 +268,34 @@ export const resendCredentials = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    const previousPassword = user.password;
+    const previousMustChangePassword = user.mustChangePassword;
     const tempPassword = generatePassword(10);
     user.password = tempPassword;
     user.mustChangePassword = true;
     await user.save();
 
-    await sendMail({
-      to: user.email,
-      subject: `Your ${user.role} Account Credentials`,
-      html: newAccountTemplate({
-        name: user.name,
-        role: user.role,
-        email: user.email,
-        tempPassword,
-      }),
-    });
+    try {
+      await sendMail({
+        to: user.email,
+        subject: `Your ${user.role} Account Credentials`,
+        html: newAccountTemplate({
+          name: user.name,
+          role: user.role,
+          email: user.email,
+          tempPassword,
+        }),
+      });
+    } catch (error) {
+      await User.findByIdAndUpdate(user._id, {
+        password: previousPassword,
+        mustChangePassword: previousMustChangePassword,
+      });
+
+      return res.status(502).json({
+        message: getMailFailureMessage(error),
+      });
+    }
 
     return res.json(new ApiResponse(200, null, "Credentials resent"));
   } catch (err) {
