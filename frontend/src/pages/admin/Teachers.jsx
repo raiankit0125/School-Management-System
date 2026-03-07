@@ -6,11 +6,7 @@ import Button from "../../components/Button";
 import Table from "../../components/Table";
 import axiosInstance from "../../api/axiosInstance";
 
-const SUBJECT_OPTIONS = ["Chemistry", "Biology", "Physics", "Science", "Mathematics"];
-const CLASS_OPTIONS = ["Class VI", "Class VII", "Class VIII", "Class IX", "Class X"];
-const TIMING_OPTIONS = ["Morning", "Afternoon", "Evening"];
 const DEVICE_OPTIONS = ["Laptop / Desktop", "Tablet", "Smartphone"];
-const INTERNET_OPTIONS = ["Wi-Fi", "Mobile Data", "Broadband"];
 const QUALIFICATION_OPTIONS = ["B.Sc", "M.Sc", "B.Ed", "M.Ed", "Others"];
 
 const createInitialForm = () => ({
@@ -28,19 +24,12 @@ const createInitialForm = () => ({
   qualification: "",
   specialization: "",
   certifications: "",
-  certificates: "",
-  subjects: [],
-  preferredClasses: [],
   experienceYears: "",
   designation: "",
   institutions: "",
   onlineExperience: "",
   onlineExperienceDetails: "",
-  preferredTimings: [],
-  timeSlots: "",
-  hoursPerWeek: "",
   devices: [],
-  internetOptions: [],
   techRating: "",
   demoReady: "",
   demoTopic: "",
@@ -150,19 +139,12 @@ export default function Teachers() {
       qualification: teacher?.qualification || "",
       specialization: teacher?.specialization || "",
       certifications: teacher?.certifications || "",
-      certificates: teacher?.certificates || "",
-      subjects: teacher?.subjects || [],
-      preferredClasses: teacher?.preferredClasses || [],
       experienceYears: teacher?.experienceYears || "",
       designation: teacher?.designation || "",
       institutions: teacher?.institutions || "",
       onlineExperience: teacher?.onlineExperience || "",
       onlineExperienceDetails: teacher?.onlineExperienceDetails || "",
-      preferredTimings: teacher?.preferredTimings || [],
-      timeSlots: teacher?.timeSlots || "",
-      hoursPerWeek: teacher?.hoursPerWeek || "",
       devices: teacher?.devices || [],
-      internetOptions: teacher?.internetOptions || [],
       techRating: teacher?.techRating || "",
       demoReady: teacher?.demoReady || "",
       demoTopic: teacher?.demoTopic || "",
@@ -201,8 +183,6 @@ export default function Teachers() {
       teacher?.designation,
       teacher?.qualification,
       teacher?.specialization,
-      ...(teacher?.subjects || []),
-      ...(teacher?.preferredClasses || []),
     ]
       .filter(Boolean)
       .join(" ")
@@ -226,8 +206,8 @@ export default function Teachers() {
               A stronger faculty onboarding screen with full admin control.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">
-              Personal info, qualification, subject preferences, class coverage, online readiness,
-              demo status, and declaration are all managed here.
+              Personal info, qualification, experience, online readiness, demo status,
+              and declaration are all managed here.
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -240,8 +220,8 @@ export default function Teachers() {
                 <p className="mt-2 text-sm text-slate-200">Create, edit, search, view, reset mail, assign, delete</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-slate-400">Reference Coverage</p>
-                <p className="mt-2 text-sm text-slate-200">Personal, academic, availability, demo, declaration</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-400">Profile Coverage</p>
+                <p className="mt-2 text-sm text-slate-200">Personal, academic, operations, demo, declaration</p>
               </div>
             </div>
           </div>
@@ -329,30 +309,9 @@ export default function Teachers() {
             </div>
             <Input label="Specialization" value={form.specialization} onChange={(e) => setField("specialization", e.target.value)} />
             <Input label="Certifications" value={form.certifications} onChange={(e) => setField("certifications", e.target.value)} />
-            <Input label="Certificate File / URL" value={form.certificates} onChange={(e) => setField("certificates", e.target.value)} />
-            <Input label="Hours Per Week" value={form.hoursPerWeek} onChange={(e) => setField("hoursPerWeek", e.target.value)} />
-            <Input label="Preferred Time Slot" value={form.timeSlots} placeholder="6:00 PM - 8:00 PM" onChange={(e) => setField("timeSlots", e.target.value)} />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <CheckboxGroup
-              title="Subjects Interested To Teach"
-              options={SUBJECT_OPTIONS}
-              values={form.subjects}
-              onToggle={(value) => toggleArrayValue("subjects", value)}
-            />
-            <CheckboxGroup
-              title="Preferred Classes"
-              options={CLASS_OPTIONS}
-              values={form.preferredClasses}
-              onToggle={(value) => toggleArrayValue("preferredClasses", value)}
-            />
-            <CheckboxGroup
-              title="Preferred Timings"
-              options={TIMING_OPTIONS}
-              values={form.preferredTimings}
-              onToggle={(value) => toggleArrayValue("preferredTimings", value)}
-            />
             <CheckboxGroup
               title="Available Devices"
               options={DEVICE_OPTIONS}
@@ -360,13 +319,6 @@ export default function Teachers() {
               onToggle={(value) => toggleArrayValue("devices", value)}
             />
           </div>
-
-          <CheckboxGroup
-            title="Internet Connectivity"
-            options={INTERNET_OPTIONS}
-            values={form.internetOptions}
-            onToggle={(value) => toggleArrayValue("internetOptions", value)}
-          />
 
           <div className="grid gap-4 md:grid-cols-3">
             <div>
@@ -510,13 +462,7 @@ export default function Teachers() {
             <DetailItem label="Gender" value={selectedTeacher?.gender} />
             <DetailItem label="City / State" value={[selectedTeacher?.city, selectedTeacher?.state].filter(Boolean).join(", ")} />
             <DetailItem label="Pincode" value={selectedTeacher?.pincode} />
-            <DetailItem label="Subjects" value={selectedTeacher?.subjects?.join(", ")} />
-            <DetailItem label="Preferred Classes" value={selectedTeacher?.preferredClasses?.join(", ")} />
-            <DetailItem label="Preferred Timings" value={selectedTeacher?.preferredTimings?.join(", ")} />
-            <DetailItem label="Time Slots" value={selectedTeacher?.timeSlots} />
-            <DetailItem label="Hours Per Week" value={selectedTeacher?.hoursPerWeek} />
             <DetailItem label="Devices" value={selectedTeacher?.devices?.join(", ")} />
-            <DetailItem label="Internet Options" value={selectedTeacher?.internetOptions?.join(", ")} />
             <DetailItem label="Online Experience" value={selectedTeacher?.onlineExperience} />
             <DetailItem label="Online Details" value={selectedTeacher?.onlineExperienceDetails} />
             <DetailItem label="Demo Ready" value={selectedTeacher?.demoReady} />
@@ -536,7 +482,6 @@ export default function Teachers() {
             { key: "email", title: "Email", render: (teacher) => teacher?.user?.email || "-" },
             { key: "subject", title: "Primary Subject", render: (teacher) => teacher?.subject || "-" },
             { key: "qualification", title: "Qualification", render: (teacher) => teacher?.qualification || "-" },
-            { key: "classes", title: "Classes", render: (teacher) => teacher?.preferredClasses?.join(", ") || "-" },
             { key: "experience", title: "Experience", render: (teacher) => teacher?.experienceYears || "-" },
             {
               key: "actions",
