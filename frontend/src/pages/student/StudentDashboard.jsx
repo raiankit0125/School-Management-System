@@ -28,15 +28,15 @@ export default function StudentDashboard() {
         subtitle="Track attendance, subject marks, notices, and connect with your faculty."
       />
 
-      <section className="relative overflow-hidden rounded-[34px] bg-slate-900 px-6 py-8 text-white shadow-[0_24px_80px_-45px_rgba(15,23,42,0.95)] lg:px-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.24),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.18),transparent_28%)]" />
+      <section className="hero-panel bg-[linear-gradient(135deg,#163d73_0%,#4562b2_58%,#d67a58_100%)] px-6 py-8 text-white lg:px-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.12),transparent_24%)]" />
         <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-sky-200/70">Learner Dashboard</p>
             <h2 className="mt-3 text-4xl font-semibold leading-tight">
               See your progress clearly and reach your faculty whenever you need help.
             </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/82">
               Students can only view their attendance and marks, receive notices, and message faculty for academic doubts.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -62,19 +62,19 @@ export default function StudentDashboard() {
       </section>
 
       <section className="mt-6 grid gap-6 md:grid-cols-4">
-        <div className="card p-6">
+        <div className="metric-card">
           <p className="text-sm text-slate-500">Academic Group</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">{profile?.classId?.name || "-"}</p>
         </div>
-        <div className="card p-6">
+        <div className="metric-card">
           <p className="text-sm text-slate-500">Roll No</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">{profile?.rollNo || "-"}</p>
         </div>
-        <div className="card p-6">
+        <div className="metric-card">
           <p className="text-sm text-slate-500">Attendance Present</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">{presentCount}</p>
         </div>
-        <div className="card p-6">
+        <div className="metric-card">
           <p className="text-sm text-slate-500">Notices</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">{notices.length}</p>
         </div>

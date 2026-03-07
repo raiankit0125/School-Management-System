@@ -6,6 +6,20 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const shellClass =
+    user?.role === "ADMIN"
+      ? "app-shell-admin"
+      : user?.role === "TEACHER"
+      ? "app-shell-teacher"
+      : "app-shell-student";
+
+  const roleAccent =
+    user?.role === "ADMIN"
+      ? "from-[#0f4c81] via-[#0f766e] to-[#c4931c]"
+      : user?.role === "TEACHER"
+      ? "from-[#0f766e] via-[#0f5f8c] to-[#d97757]"
+      : "from-[#0f5f8c] via-[#4463b3] to-[#d97757]";
+
   const links =
     user?.role === "ADMIN"
       ? [
@@ -36,13 +50,23 @@ export default function Layout({ children }) {
         ];
 
   return (
-    <div className="app-shell flex">
+    <div className={`app-shell ${shellClass} flex`}>
       {/* Sidebar */}
-      <aside className="w-72 bg-white/90 border-r border-slate-200/60 p-5 hidden lg:flex flex-col gap-8 shadow-[6px_0_30px_-26px_rgba(15,23,42,0.6)]">
-        <div className="rounded-2xl bg-gradient-to-br from-teal-600 via-cyan-600 to-sky-600 p-5 text-white shadow-lg">
+      <aside className="hidden w-80 flex-col gap-8 border-r border-white/60 bg-white/55 p-5 shadow-[10px_0_45px_-34px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:flex">
+        <div className={`rounded-[28px] bg-gradient-to-br ${roleAccent} p-6 text-white shadow-xl`}>
           <p className="text-xs uppercase tracking-widest text-white/70">Portal</p>
-          <h2 className="text-2xl font-semibold mt-2">Academic Hub</h2>
-          <p className="text-sm text-white/80 mt-1">Built for schools and colleges</p>
+          <h2 className="mt-2 text-3xl font-semibold">Academic Hub</h2>
+          <p className="mt-2 text-sm text-white/80">Built for schools, colleges, and modern academic teams</p>
+          <div className="mt-5 grid grid-cols-2 gap-3 text-xs text-white/90">
+            <div className="rounded-2xl bg-white/12 px-3 py-3">
+              <p className="uppercase tracking-[0.2em] text-white/60">Role</p>
+              <p className="mt-2 text-sm font-semibold">{user?.role}</p>
+            </div>
+            <div className="rounded-2xl bg-white/12 px-3 py-3">
+              <p className="uppercase tracking-[0.2em] text-white/60">Status</p>
+              <p className="mt-2 text-sm font-semibold">Active Session</p>
+            </div>
+          </div>
         </div>
 
         <nav className="flex flex-col gap-2">
@@ -51,10 +75,10 @@ export default function Layout({ children }) {
               key={l.to}
               to={l.to}
               className={({ isActive }) =>
-                `px-4 py-2.5 rounded-xl text-sm font-semibold transition ${
+                `sidebar-link ${
                   isActive
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-slate-100"
+                    ? "sidebar-link-active"
+                    : "sidebar-link-idle"
                 }`
               }
             >
@@ -63,17 +87,17 @@ export default function Layout({ children }) {
           ))}
         </nav>
 
-        <div className="mt-auto rounded-2xl border border-slate-200/70 bg-white/80 p-4">
+        <div className="mt-auto rounded-[26px] border border-white/70 bg-white/75 p-5 shadow-[0_20px_45px_-36px_rgba(15,23,42,0.36)]">
           <p className="text-xs text-slate-500">Signed in as</p>
-          <p className="mt-1 text-sm font-semibold text-slate-800">{user?.name}</p>
-          <p className="text-xs text-slate-500">{user?.role}</p>
+          <p className="mt-1 text-base font-semibold text-slate-800">{user?.name}</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{user?.role}</p>
         </div>
       </aside>
 
       {/* Main */}
       <div className="flex-1">
         {/* Navbar */}
-        <header className="sticky top-0 z-10 backdrop-blur bg-white/80 border-b border-slate-200/70 px-6 py-4 flex justify-between items-center">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/60 bg-white/45 px-6 py-4 backdrop-blur-xl">
           <div>
             <h1 className="text-lg font-semibold text-slate-900">{user?.role} Workspace</h1>
             <p className="text-sm text-slate-500">{user?.name}</p>
@@ -90,9 +114,9 @@ export default function Layout({ children }) {
           </Button>
         </header>
 
-        <main className="p-6 lg:p-8">
+        <main className="p-5 lg:p-8">
           {children}
-          <footer className="mt-10 rounded-3xl border border-slate-200/70 bg-white/80 px-6 py-5 text-sm text-slate-500">
+          <footer className="mt-10 rounded-[30px] border border-white/70 bg-white/70 px-6 py-6 text-sm text-slate-600 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <p>Academic Hub supports faculty operations, student progress, attendance, notices, and communication.</p>
               <p>Designed for school and college workflows.</p>
