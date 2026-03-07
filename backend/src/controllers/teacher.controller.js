@@ -3,6 +3,7 @@ import { Student } from "../models/Student.model.js";
 import { ClassModel } from "../models/Class.model.js";
 import { Attendance } from "../models/Attendance.model.js";
 import { Mark } from "../models/Mark.model.js";
+import { Notice } from "../models/Notice.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { parseUploadedFile } from "../utils/parseFile.js";
 
@@ -19,6 +20,11 @@ export const myClasses = async (req, res) => {
 
 export const getStudentsByClass = async (req, res) => {
   const { classId } = req.params;
+  const teacher = await Teacher.findOne({ user: req.user._id });
+  const assignedClass = await ClassModel.findOne({ _id: classId, teacher: teacher?._id });
+  if (!assignedClass) {
+    return res.status(403).json({ message: "You are not assigned to this academic group" });
+  }
   const students = await Student.find({ classId })
     .populate("user", "-password")
     .populate("classId");
@@ -28,6 +34,10 @@ export const getStudentsByClass = async (req, res) => {
 export const markAttendance = async (req, res) => {
   const teacher = await Teacher.findOne({ user: req.user._id });
   const { classId, date, records } = req.body;
+  const assignedClass = await ClassModel.findOne({ _id: classId, teacher: teacher?._id });
+  if (!assignedClass) {
+    return res.status(403).json({ message: "You are not assigned to this academic group" });
+  }
   // records: [{studentId, status}]
 
   const ops = records.map((r) => ({
@@ -45,18 +55,27 @@ export const markAttendance = async (req, res) => {
 export const uploadMarks = async (req, res) => {
   const teacher = await Teacher.findOne({ user: req.user._id });
   const { classId, subject, marksList, maxMarks } = req.body;
+  const assignedClass = await ClassModel.findOne({ _id: classId, teacher: teacher?._id });
+  if (!assignedClass) {
+    return res.status(403).json({ message: "You are not assigned to this academic group" });
+  }
   // marksList: [{studentId, marks}]
 
-  const docs = marksList.map((m) => ({
-    classId,
-    studentId: m.studentId,
-    subject,
-    marks: m.marks,
-    maxMarks: maxMarks || 100,
-    uploadedBy: teacher._id,
-  }));
+  for (const item of marksList) {
+    await Mark.findOneAndUpdate(
+      { classId, studentId: item.studentId, subject },
+      {
+        classId,
+        studentId: item.studentId,
+        subject,
+        marks: item.marks,
+        maxMarks: maxMarks || 100,
+        uploadedBy: teacher._id,
+      },
+      { upsert: true, new: true }
+    );
+  }
 
-  await Mark.insertMany(docs);
   return res.status(201).json(new ApiResponse(201, null, "Marks uploaded"));
 };
 
@@ -229,5 +248,43 @@ export const bulkUploadAttendance = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
+};
+
+export const sendStudentNotice = async (req, res) => {
+  const teacher = await Teacher.findOne({ user: req.user._id });
+  const { studentId, title, message } = req.body;
+
+  if (!studentId || !title?.trim() || !message?.trim()) {
+    return res.status(400).json({ message: "studentId, title and message are required" });
+  }
+
+  const student = await Student.findById(studentId).populate("classId");
+  if (!student) return res.status(404).json({ message: "Student not found" });
+
+  const allowedClass = await ClassModel.findOne({ _id: student.classId?._id, teacher: teacher?._id });
+  if (!allowedClass) {
+    return res.status(403).json({ message: "You can notify only your assigned students" });
+  }
+
+  const notice = await Notice.create({
+    teacherId: teacher._id,
+    studentId,
+    title: title.trim(),
+    message: message.trim(),
+  });
+
+  return res.status(201).json(new ApiResponse(201, notice, "Notice sent"));
+};
+
+export const getTeacherNotices = async (req, res) => {
+  const teacher = await Teacher.findOne({ user: req.user._id });
+  const notices = await Notice.find({ teacherId: teacher?._id })
+    .sort({ createdAt: -1 })
+    .populate({
+      path: "studentId",
+      populate: [{ path: "user", select: "name email" }, { path: "classId", select: "name" }],
+    });
+
+  return res.json(new ApiResponse(200, notices, "Teacher notices"));
 };
 

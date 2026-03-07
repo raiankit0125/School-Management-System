@@ -14,20 +14,25 @@ export default function Layout({ children }) {
           { name: "Students", to: "/admin/students" },
           { name: "Bulk Upload", to: "/admin/bulk-upload" },
           { name: "Classes", to: "/admin/classes" },
+          { name: "Chat", to: "/admin/chat" },
         ]
       : user?.role === "TEACHER"
       ? [
           { name: "Dashboard", to: "/teacher" },
-          { name: "My Classes", to: "/teacher/classes" },
+          { name: "Academic Groups", to: "/teacher/classes" },
           { name: "Attendance", to: "/teacher/attendance" },
-          { name: "Bulk Marks Upload", to: "/teacher/bulk-marks" },
-          { name: "Bulk Attendance Upload", to: "/teacher/bulk-attendance" },
+          { name: "Bulk Marks", to: "/teacher/bulk-marks" },
+          { name: "Bulk Attendance", to: "/teacher/bulk-attendance" },
           { name: "Marks", to: "/teacher/marks" },
+          { name: "Notices", to: "/teacher/notices" },
+          { name: "Chat", to: "/teacher/chat" },
         ]
       : [
           { name: "Dashboard", to: "/student" },
           { name: "My Attendance", to: "/student/attendance" },
           { name: "My Marks", to: "/student/marks" },
+          { name: "My Notices", to: "/student/notices" },
+          { name: "Chat", to: "/student/chat" },
         ];
 
   return (
@@ -36,8 +41,8 @@ export default function Layout({ children }) {
       <aside className="w-72 bg-white/90 border-r border-slate-200/60 p-5 hidden lg:flex flex-col gap-8 shadow-[6px_0_30px_-26px_rgba(15,23,42,0.6)]">
         <div className="rounded-2xl bg-gradient-to-br from-teal-600 via-cyan-600 to-sky-600 p-5 text-white shadow-lg">
           <p className="text-xs uppercase tracking-widest text-white/70">Portal</p>
-          <h2 className="text-2xl font-semibold mt-2">School System</h2>
-          <p className="text-sm text-white/80 mt-1">Manage with clarity</p>
+          <h2 className="text-2xl font-semibold mt-2">Academic Hub</h2>
+          <p className="text-sm text-white/80 mt-1">Built for schools and colleges</p>
         </div>
 
         <nav className="flex flex-col gap-2">
@@ -70,7 +75,7 @@ export default function Layout({ children }) {
         {/* Navbar */}
         <header className="sticky top-0 z-10 backdrop-blur bg-white/80 border-b border-slate-200/70 px-6 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-lg font-semibold text-slate-900">{user?.role} Panel</h1>
+            <h1 className="text-lg font-semibold text-slate-900">{user?.role} Workspace</h1>
             <p className="text-sm text-slate-500">{user?.name}</p>
           </div>
 
@@ -85,7 +90,15 @@ export default function Layout({ children }) {
           </Button>
         </header>
 
-        <main className="p-6 lg:p-8">{children}</main>
+        <main className="p-6 lg:p-8">
+          {children}
+          <footer className="mt-10 rounded-3xl border border-slate-200/70 bg-white/80 px-6 py-5 text-sm text-slate-500">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <p>Academic Hub supports faculty operations, student progress, attendance, notices, and communication.</p>
+              <p>Designed for school and college workflows.</p>
+            </div>
+          </footer>
+        </main>
       </div>
     </div>
   );

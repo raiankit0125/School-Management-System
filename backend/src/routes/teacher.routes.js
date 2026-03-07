@@ -12,6 +12,8 @@ import {
   getStudentsByClass,
   markAttendance,
   uploadMarks,
+  sendStudentNotice,
+  getTeacherNotices,
 } from "../controllers/teacher.controller.js";
 
 const router = express.Router();
@@ -27,6 +29,8 @@ router.post("/marks", uploadMarks);
 router.get("/attendance-status", todayAttendanceStatus);
 router.post("/bulk/marks", upload.single("file"), bulkUploadMarks);
 router.post("/bulk/attendance", upload.single("file"), bulkUploadAttendance);
+router.get("/notices", getTeacherNotices);
+router.post("/notices", sendStudentNotice);
 
 
 

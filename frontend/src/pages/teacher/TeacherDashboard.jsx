@@ -8,92 +8,77 @@ import { useNavigate } from "react-router-dom";
 export default function TeacherDashboard() {
   const [profile, setProfile] = useState(null);
   const [status, setStatus] = useState(null);
+  const [classes, setClasses] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get("/teacher/me").then((res) => setProfile(res.data.data));
-    axiosInstance
-      .get("/teacher/attendance-status")
-      .then((res) => setStatus(res.data.data));
+    axiosInstance.get("/teacher/attendance-status").then((res) => setStatus(res.data.data));
+    axiosInstance.get("/teacher/classes").then((res) => setClasses(res.data.data));
   }, []);
-
-  const StatCard = ({ title, value }) => (
-    <div className="card p-6">
-      <p className="text-slate-500 text-sm">{title}</p>
-      <h2 className="text-xl font-semibold mt-2 text-slate-900">{value}</h2>
-    </div>
-  );
 
   return (
     <Layout>
-      <PageTitle title="Teacher Dashboard" subtitle="Quick overview & actions" />
+      <PageTitle
+        title="Faculty Dashboard"
+        subtitle="Manage attendance, subject-wise marks, student notices, and communication."
+      />
 
-      {/* Top Cards */}
-      <div className="grid md:grid-cols-3 gap-6 mb-6">
-        <StatCard title="Teacher Name" value={profile?.user?.name || "-"} />
-        <StatCard title="Email" value={profile?.user?.email || "-"} />
-        <StatCard title="Subject" value={profile?.subject || "-"} />
-      </div>
-
-      {/* Attendance Status + Quick Actions */}
-      <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div className="card p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">Today Attendance Status</h3>
-          <p className="text-slate-500 text-sm mb-4">
-            Date: <b>{status?.today || "-"}</b>
-          </p>
-
-          <div className="flex items-center gap-3">
-            <span
-              className={`px-4 py-2 rounded-xl font-semibold text-sm ${
-                status?.attendanceMarked
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-rose-100 text-rose-700"
-              }`}
-            >
-              {status?.attendanceMarked ? "Marked ✅" : "Not Marked ❌"}
-            </span>
-
-            <span className="text-slate-600 text-sm">
-              Classes: <b>{status?.totalClasses ?? 0}</b>
-            </span>
-          </div>
-        </div>
-
-        <div className="card p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">Quick Actions</h3>
-          <p className="text-slate-500 text-sm mb-4">
-            Jump to attendance or marks
-          </p>
-
-          <div className="flex gap-3">
-            <Button onClick={() => navigate("/teacher/attendance")}>
-              Mark Attendance
-            </Button>
-
-            <Button variant="outline" onClick={() => navigate("/teacher/marks")}>
-              Upload Marks
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Profile Details */}
-      <div className="card p-6">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Profile Details</h3>
-
-        <div className="grid md:grid-cols-2 gap-6">
+      <section className="relative overflow-hidden rounded-[34px] bg-white p-6 shadow-[0_24px_80px_-45px_rgba(15,23,42,0.7)] lg:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.14),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.16),transparent_28%)]" />
+        <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <p className="text-sm text-slate-500">Phone</p>
-            <p className="font-semibold text-slate-900">{profile?.phone || "-"}</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-teal-700/70">Faculty Workspace</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-tight text-slate-900">
+              Work class-wise, upload subject marks, manage attendance, and respond to student queries.
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600">
+              Once admin registers and assigns academic groups, faculty can log in, reset password, and handle operational teaching tasks.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button onClick={() => navigate("/teacher/attendance")}>Open Attendance</Button>
+              <Button variant="outline" onClick={() => navigate("/teacher/marks")}>Open Marks</Button>
+              <Button variant="outline" onClick={() => navigate("/teacher/notices")}>Send Notice</Button>
+              <Button variant="outline" onClick={() => navigate("/teacher/chat")}>Open Chat</Button>
+            </div>
           </div>
 
-          <div>
-            <p className="text-sm text-slate-500">Role</p>
-            <p className="font-semibold text-slate-900">{profile?.user?.role || "-"}</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <img
+              src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=900&q=80"
+              alt="Faculty workspace"
+              className="float-card h-52 w-full rounded-[26px] object-cover shadow-xl"
+            />
+            <img
+              src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80"
+              alt="Teaching operations"
+              className="float-card h-52 w-full rounded-[26px] object-cover shadow-xl [animation-delay:1s]"
+            />
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="mt-6 grid gap-6 md:grid-cols-4">
+        <div className="card p-6">
+          <p className="text-sm text-slate-500">Faculty Name</p>
+          <p className="mt-2 text-xl font-semibold text-slate-900">{profile?.user?.name || "-"}</p>
+        </div>
+        <div className="card p-6">
+          <p className="text-sm text-slate-500">Primary Subject</p>
+          <p className="mt-2 text-xl font-semibold text-slate-900">{profile?.subject || "-"}</p>
+        </div>
+        <div className="card p-6">
+          <p className="text-sm text-slate-500">Assigned Groups</p>
+          <p className="mt-2 text-xl font-semibold text-slate-900">{classes.length}</p>
+        </div>
+        <div className="card p-6">
+          <p className="text-sm text-slate-500">Attendance Today</p>
+          <p className="mt-2 text-xl font-semibold text-slate-900">
+            {status?.attendanceMarked ? "Completed" : "Pending"}
+          </p>
+        </div>
+      </section>
     </Layout>
   );
 }

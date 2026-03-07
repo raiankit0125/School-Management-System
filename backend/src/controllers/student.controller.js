@@ -1,6 +1,7 @@
 import { Student } from "../models/Student.model.js";
 import { Attendance } from "../models/Attendance.model.js";
 import { Mark } from "../models/Mark.model.js";
+import { Notice } from "../models/Notice.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 export const myProfile = async (req, res) => {
@@ -20,4 +21,16 @@ export const myMarks = async (req, res) => {
   const student = await Student.findOne({ user: req.user._id });
   const list = await Mark.find({ studentId: student._id }).sort({ createdAt: -1 });
   return res.json(new ApiResponse(200, list, "My marks"));
+};
+
+export const myNotices = async (req, res) => {
+  const student = await Student.findOne({ user: req.user._id });
+  const list = await Notice.find({ studentId: student._id })
+    .sort({ createdAt: -1 })
+    .populate({
+      path: "teacherId",
+      populate: { path: "user", select: "name email" },
+    });
+
+  return res.json(new ApiResponse(200, list, "My notices"));
 };
