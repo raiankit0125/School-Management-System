@@ -1,4 +1,4 @@
-import { getTransporter, hasSmtpConfig } from "./mailTransporter.js";
+import { getTransportConfigs, getTransporter, hasSmtpConfig } from "./mailTransporter.js";
 
 const buildFromAddress = () => {
   const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
@@ -15,20 +15,32 @@ export const sendMail = async ({ to, subject, html, text }) => {
     throw new Error("to, subject, and mail body are required");
   }
 
-  const transporter = getTransporter();
+  const configs = getTransportConfigs();
+  const errors = [];
 
-  const info = await transporter.sendMail({
-    from: buildFromAddress(),
-    to,
-    subject,
-    html,
-    text,
-  });
+  for (const config of configs) {
+    try {
+      const transporter = getTransporter(config);
 
-  console.log("Mail sent to:", to);
-  console.log("Message ID:", info.messageId);
+      const info = await transporter.sendMail({
+        from: buildFromAddress(),
+        to,
+        subject,
+        html,
+        text,
+      });
 
-  return info;
+      console.log("Mail sent to:", to);
+      console.log("Message ID:", info.messageId);
+      console.log("SMTP transport:", `${config.host}:${config.port}${config.service ? ` (${config.service})` : ""}`);
+
+      return info;
+    } catch (error) {
+      errors.push(`${config.host}:${config.port} ${error.message}`);
+    }
+  }
+
+  throw new Error(errors.join(" | "));
 };
 
 export const queueMail = ({ to, subject, html, text, label = "Mail" }) => {
