@@ -67,12 +67,28 @@ export default function Students() {
     setForm(createInitialForm());
   };
 
+  const buildCredentialAlert = (label, responseData) => {
+    const credentials = responseData?.data?.credentials;
+
+    if (!credentials?.tempPassword) {
+      return `${label} successfully`;
+    }
+
+    const mailNote = credentials.emailSent === false
+      ? `\nMail issue: ${credentials.mailError || "Email could not be delivered"}`
+      : credentials.mailQueued
+        ? "\nEmail has been queued in background."
+        : "\nEmail sent successfully.";
+
+    return `${label} successfully\nEmail: ${credentials.email}\nTemporary Password: ${credentials.tempPassword}${mailNote}`;
+  };
+
   const createStudent = async () => {
     try {
-      await axiosInstance.post("/admin/student", form);
+      const res = await axiosInstance.post("/admin/student", form);
       resetForm();
       fetchData();
-      alert("Student added successfully");
+      alert(buildCredentialAlert("Student added", res.data));
     } catch (err) {
       const message = err?.response?.data?.message || "Failed to create student";
       if (message === "Student already exists") {
@@ -375,8 +391,8 @@ export default function Students() {
                     variant="outline"
                     onClick={async () => {
                       try {
-                        await axiosInstance.post(`/admin/resend/${student.user._id}`);
-                        alert("Reset credentials sent successfully");
+                        const res = await axiosInstance.post(`/admin/resend/${student.user._id}`);
+                        alert(buildCredentialAlert("Student reset credentials generated", res.data));
                       } catch (err) {
                         alert(err?.response?.data?.message || "Reset mail failed");
                       }

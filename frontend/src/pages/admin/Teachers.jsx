@@ -114,12 +114,28 @@ export default function Teachers() {
     setForm(createInitialForm());
   };
 
+  const buildCredentialAlert = (label, responseData) => {
+    const credentials = responseData?.data?.credentials;
+
+    if (!credentials?.tempPassword) {
+      return `${label} successfully`;
+    }
+
+    const mailNote = credentials.emailSent === false
+      ? `\nMail issue: ${credentials.mailError || "Email could not be delivered"}`
+      : credentials.mailQueued
+        ? "\nEmail has been queued in background."
+        : "\nEmail sent successfully.";
+
+    return `${label} successfully\nEmail: ${credentials.email}\nTemporary Password: ${credentials.tempPassword}${mailNote}`;
+  };
+
   const createTeacher = async () => {
     try {
-      await axiosInstance.post("/admin/teacher", form);
+      const res = await axiosInstance.post("/admin/teacher", form);
       resetForm();
       fetchTeachers();
-      alert("Faculty added successfully");
+      alert(buildCredentialAlert("Faculty added", res.data));
     } catch (err) {
       const message = err?.response?.data?.message || "Failed to create faculty";
       if (message === "Teacher already exists") {
@@ -512,8 +528,8 @@ export default function Teachers() {
                     variant="outline"
                     onClick={async () => {
                       try {
-                        await axiosInstance.post(`/admin/resend/${teacher.user._id}`);
-                        alert("Reset credentials sent successfully");
+                        const res = await axiosInstance.post(`/admin/resend/${teacher.user._id}`);
+                        alert(buildCredentialAlert("Faculty reset credentials generated", res.data));
                       } catch (err) {
                         alert(err?.response?.data?.message || "Reset mail failed");
                       }

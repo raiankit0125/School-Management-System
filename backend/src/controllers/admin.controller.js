@@ -116,6 +116,14 @@ const getMailFailureMessage = (error) => {
   return error?.message || "Unable to send reset email";
 };
 
+const buildCredentialPayload = ({ email, tempPassword, emailSent = null, mailQueued = null, mailError = "" }) => ({
+  email,
+  tempPassword,
+  emailSent,
+  mailQueued,
+  mailError,
+});
+
 export const getDashboard = async (req, res) => {
   const totalTeachers = await User.countDocuments({ role: "TEACHER" });
   const totalStudents = await User.countDocuments({ role: "STUDENT" });
@@ -166,7 +174,15 @@ export const createTeacher = async (req, res) => {
       .json(
         new ApiResponse(
           201,
-          { user, teacher },
+          {
+            user,
+            teacher,
+            credentials: buildCredentialPayload({
+              email: normalizedEmail,
+              tempPassword,
+              mailQueued: true,
+            }),
+          },
           "Teacher created successfully. Credentials email queued."
         )
       );
@@ -248,7 +264,15 @@ export const createStudent = async (req, res) => {
     return res.status(201).json(
       new ApiResponse(
         201,
-        { user, student },
+        {
+          user,
+          student,
+          credentials: buildCredentialPayload({
+            email: normalizedEmail,
+            tempPassword,
+            mailQueued: true,
+          }),
+        },
         "Student created successfully. Credentials email queued."
       )
     );
@@ -268,8 +292,6 @@ export const resendCredentials = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const previousPassword = user.password;
-    const previousMustChangePassword = user.mustChangePassword;
     const tempPassword = generatePassword(10);
     user.password = tempPassword;
     user.mustChangePassword = true;
@@ -286,18 +308,36 @@ export const resendCredentials = async (req, res) => {
           tempPassword,
         }),
       });
+
+      return res.json(
+        new ApiResponse(
+          200,
+          {
+            credentials: buildCredentialPayload({
+              email: user.email,
+              tempPassword,
+              emailSent: true,
+            }),
+          },
+          "Credentials resent"
+        )
+      );
     } catch (error) {
-      await User.findByIdAndUpdate(user._id, {
-        password: previousPassword,
-        mustChangePassword: previousMustChangePassword,
-      });
-
-      return res.status(502).json({
-        message: getMailFailureMessage(error),
-      });
+      return res.json(
+        new ApiResponse(
+          200,
+          {
+            credentials: buildCredentialPayload({
+              email: user.email,
+              tempPassword,
+              emailSent: false,
+              mailError: getMailFailureMessage(error),
+            }),
+          },
+          "Credentials reset completed, but email could not be delivered."
+        )
+      );
     }
-
-    return res.json(new ApiResponse(200, null, "Credentials resent"));
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
