@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { isEmail } from "../utils/formValidation";
 
 export default function Login() {
     const [email, setEmail] = useState("admin@gmail.com");
@@ -15,6 +16,14 @@ export default function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        if (!isEmail(email)) {
+            alert("Enter a valid email address");
+            return;
+        }
+        if (!password.trim()) {
+            alert("Password is required");
+            return;
+        }
         try {
             setLoading(true);
             const res = await axiosInstance.post("/auth/login", { email, password });
@@ -78,9 +87,11 @@ export default function Login() {
                     <form className="mt-6 space-y-4" onSubmit={handleLogin}>
                         <Input
                             label="Email"
+                            type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             autoComplete="email"
+                            required
                         />
                         <Input
                             label="Password"
@@ -88,6 +99,7 @@ export default function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             autoComplete="current-password"
+                            required
                         />
 
                         <Button className="w-full" type="submit" disabled={loading}>

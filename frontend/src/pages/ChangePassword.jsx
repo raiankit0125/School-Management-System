@@ -14,6 +14,14 @@ export default function ChangePassword() {
   const { user } = useAuth();
 
   const handleChange = async () => {
+    if (!oldPassword.trim()) {
+      alert("Old password is required");
+      return;
+    }
+    if (newPassword.length < 6) {
+      alert("New password must be at least 6 characters");
+      return;
+    }
     try {
       setLoading(true);
       await axiosInstance.post("/user/change-password", { oldPassword, newPassword });
@@ -46,6 +54,7 @@ export default function ChangePassword() {
             value={oldPassword}
             onChange={(e) => setOldPassword(e.target.value)}
             autoComplete="current-password"
+            required
           />
           <Input
             label="New Password"
@@ -53,6 +62,8 @@ export default function ChangePassword() {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             autoComplete="new-password"
+            minLength={6}
+            required
           />
 
           <Button className="w-full" onClick={handleChange} disabled={loading}>

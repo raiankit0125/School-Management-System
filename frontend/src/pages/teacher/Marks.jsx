@@ -4,6 +4,7 @@ import PageTitle from "../../components/PageTitle";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 import axiosInstance from "../../api/axiosInstance";
+import { isPositiveNumber } from "../../utils/formValidation";
 
 export default function Marks() {
   const [classes, setClasses] = useState([]);
@@ -28,6 +29,27 @@ export default function Marks() {
   }, [classId]);
 
   const uploadMarks = async () => {
+    if (!classId) {
+      alert("Select a class first");
+      return;
+    }
+    if (!subject.trim()) {
+      alert("Subject is required");
+      return;
+    }
+    if (!isPositiveNumber(maxMarks)) {
+      alert("Max marks must be a positive number");
+      return;
+    }
+    const invalidMarks = Object.values(marksMap).some((value) => {
+      const mark = Number(value);
+      return !Number.isFinite(mark) || mark < 0 || mark > Number(maxMarks);
+    });
+    if (invalidMarks) {
+      alert("Each student's marks must be between 0 and max marks");
+      return;
+    }
+
     const marksList = Object.keys(marksMap).map((studentId) => ({
       studentId,
       marks: Number(marksMap[studentId]),
@@ -81,8 +103,8 @@ export default function Marks() {
           </select>
         </div>
 
-        <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} />
-        <Input label="Max Marks" type="number" value={maxMarks} onChange={(e) => setMaxMarks(e.target.value)} />
+        <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} required />
+        <Input label="Max Marks" type="number" min="1" value={maxMarks} onChange={(e) => setMaxMarks(e.target.value)} required />
 
         <div className="flex items-end">
           <Button onClick={uploadMarks} className="w-full">Upload</Button>
@@ -101,6 +123,8 @@ export default function Marks() {
 
             <input
               type="number"
+              min="0"
+              max={maxMarks}
               className="input-field w-28"
               value={marksMap[s._id] ?? 0}
               onChange={(e) => setMarksMap({ ...marksMap, [s._id]: e.target.value })}

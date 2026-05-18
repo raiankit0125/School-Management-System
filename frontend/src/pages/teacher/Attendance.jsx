@@ -26,6 +26,15 @@ export default function Attendance() {
   }, [classId]);
 
   const saveAttendance = async () => {
+    if (!classId) {
+      alert("Select a class first");
+      return;
+    }
+    if (!date) {
+      alert("Attendance date is required");
+      return;
+    }
+
     const records = Object.keys(statusMap).map((studentId) => ({
       studentId,
       status: statusMap[studentId],

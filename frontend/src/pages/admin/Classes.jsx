@@ -23,10 +23,14 @@ export default function Classes() {
   };
 
   useEffect(() => {
-    fetchData();
+    Promise.resolve().then(fetchData);
   }, []);
 
   const createClass = async () => {
+    if (!name.trim()) {
+      alert("Class name is required");
+      return;
+    }
     await axiosInstance.post("/admin/class", { name, teacherId });
     setName("");
     setTeacherId("");
@@ -47,6 +51,10 @@ export default function Classes() {
   };
 
   const updateClass = async () => {
+    if (!name.trim()) {
+      alert("Class name is required");
+      return;
+    }
     await axiosInstance.put(`/admin/class/${editingId}`, { name, teacherId });
     setEditingId(null);
     setName("");
@@ -104,7 +112,7 @@ export default function Classes() {
         </h3>
 
         <div className="grid md:grid-cols-3 gap-4">
-          <Input label="Class Name (e.g. 10-A)" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input label="Class Name (e.g. 10-A)" value={name} onChange={(e) => setName(e.target.value)} required />
 
           <div>
             <label className="label">Assign Faculty</label>

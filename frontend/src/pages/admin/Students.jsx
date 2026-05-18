@@ -5,6 +5,7 @@ import Input from "../../components/Input";
 import Button from "../../components/Button";
 import Table from "../../components/Table";
 import axiosInstance from "../../api/axiosInstance";
+import { digitsOnly, isEmail, validatePhone, validatePincode } from "../../utils/formValidation";
 
 const createInitialForm = () => ({
   name: "",
@@ -55,11 +56,27 @@ export default function Students() {
   };
 
   useEffect(() => {
-    fetchData();
+    Promise.resolve().then(fetchData);
   }, []);
 
   const setField = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const setDigitsField = (key, value, maxLength) => {
+    setField(key, digitsOnly(value, maxLength));
+  };
+
+  const validateStudentForm = () => {
+    if (!form.name.trim()) return "Student name is required";
+    if (!isEmail(form.email)) return "Enter a valid email address";
+    const phoneError = validatePhone(form.phone, "Phone");
+    if (phoneError) return phoneError;
+    const guardianPhoneError = validatePhone(form.guardianPhone, "Guardian phone");
+    if (guardianPhoneError) return guardianPhoneError;
+    const pincodeError = validatePincode(form.pincode);
+    if (pincodeError) return pincodeError;
+    return "";
   };
 
   const resetForm = () => {
@@ -85,6 +102,11 @@ export default function Students() {
 
   const createStudent = async () => {
     try {
+      const validationMessage = validateStudentForm();
+      if (validationMessage) {
+        alert(validationMessage);
+        return;
+      }
       const res = await axiosInstance.post("/admin/student", form);
       resetForm();
       fetchData();
@@ -128,6 +150,11 @@ export default function Students() {
 
   const updateStudent = async () => {
     try {
+      const validationMessage = validateStudentForm();
+      if (validationMessage) {
+        alert(validationMessage);
+        return;
+      }
       await axiosInstance.put(`/admin/student/${editingId}`, form);
       resetForm();
       fetchData();
@@ -236,8 +263,8 @@ export default function Students() {
 
         <div className="mt-6 grid gap-6">
           <div className="grid gap-4 md:grid-cols-3">
-            <Input label="Student Name" value={form.name} onChange={(e) => setField("name", e.target.value)} />
-            <Input label="Email Address" type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} />
+            <Input label="Student Name" value={form.name} onChange={(e) => setField("name", e.target.value)} required />
+            <Input label="Email Address" type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} required />
             <div>
               <label className="label">Class</label>
               <select className="select-field mt-1" value={form.classId} onChange={(e) => setField("classId", e.target.value)}>
@@ -252,7 +279,7 @@ export default function Students() {
             <Input label="Roll No" value={form.rollNo} onChange={(e) => setField("rollNo", e.target.value)} />
             <Input label="Admission No" value={form.admissionNo} onChange={(e) => setField("admissionNo", e.target.value)} />
             <Input label="Section" value={form.section} onChange={(e) => setField("section", e.target.value)} />
-            <Input label="Phone" value={form.phone} onChange={(e) => setField("phone", e.target.value)} />
+            <Input label="Phone" type="tel" inputMode="numeric" maxLength={10} value={form.phone} onChange={(e) => setDigitsField("phone", e.target.value, 10)} />
             <Input label="Date of Birth" type="date" value={form.dob} onChange={(e) => setField("dob", e.target.value)} />
             <div>
               <label className="label">Gender</label>
@@ -265,9 +292,9 @@ export default function Students() {
             </div>
             <Input label="City" value={form.city} onChange={(e) => setField("city", e.target.value)} />
             <Input label="State" value={form.state} onChange={(e) => setField("state", e.target.value)} />
-            <Input label="Pincode" value={form.pincode} onChange={(e) => setField("pincode", e.target.value)} />
+            <Input label="Pincode" inputMode="numeric" maxLength={6} value={form.pincode} onChange={(e) => setDigitsField("pincode", e.target.value, 6)} />
             <Input label="Guardian Name" value={form.guardianName} onChange={(e) => setField("guardianName", e.target.value)} />
-            <Input label="Guardian Phone" value={form.guardianPhone} onChange={(e) => setField("guardianPhone", e.target.value)} />
+            <Input label="Guardian Phone" type="tel" inputMode="numeric" maxLength={10} value={form.guardianPhone} onChange={(e) => setDigitsField("guardianPhone", e.target.value, 10)} />
             <Input label="Transport Mode" value={form.transportMode} onChange={(e) => setField("transportMode", e.target.value)} />
           </div>
 

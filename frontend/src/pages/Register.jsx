@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { isEmail } from "../utils/formValidation";
 
 export default function Register() {
   const [name, setName] = useState("Admin");
@@ -14,6 +15,18 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!name.trim()) {
+      alert("Name is required");
+      return;
+    }
+    if (!isEmail(email)) {
+      alert("Enter a valid email address");
+      return;
+    }
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
     try {
       setLoading(true);
 
@@ -62,12 +75,15 @@ export default function Register() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoComplete="name"
+              required
             />
             <Input
               label="Email"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
+              required
             />
             <Input
               label="Password"
@@ -75,6 +91,8 @@ export default function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
+              minLength={6}
+              required
             />
 
             <Button className="w-full" type="submit" disabled={loading}>

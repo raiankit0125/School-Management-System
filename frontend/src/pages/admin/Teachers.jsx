@@ -5,6 +5,7 @@ import Input from "../../components/Input";
 import Button from "../../components/Button";
 import Table from "../../components/Table";
 import axiosInstance from "../../api/axiosInstance";
+import { digitsOnly, isEmail, validatePhone, validatePincode } from "../../utils/formValidation";
 
 const DEVICE_OPTIONS = ["Laptop / Desktop", "Tablet", "Smartphone"];
 const QUALIFICATION_OPTIONS = ["B.Sc", "M.Sc", "B.Ed", "M.Ed", "Others"];
@@ -93,11 +94,30 @@ export default function Teachers() {
   };
 
   useEffect(() => {
-    fetchTeachers();
+    Promise.resolve().then(fetchTeachers);
   }, []);
 
   const setField = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const setDigitsField = (key, value, maxLength) => {
+    setField(key, digitsOnly(value, maxLength));
+  };
+
+  const validateTeacherForm = () => {
+    if (!form.name.trim()) return "Faculty name is required";
+    if (!isEmail(form.email)) return "Enter a valid email address";
+    const phoneError = validatePhone(form.phone, "Mobile number");
+    if (phoneError) return phoneError;
+    const alternatePhoneError = validatePhone(form.alternatePhone, "Alternate mobile");
+    if (alternatePhoneError) return alternatePhoneError;
+    const pincodeError = validatePincode(form.pincode);
+    if (pincodeError) return pincodeError;
+    if (form.experienceYears && (!Number.isFinite(Number(form.experienceYears)) || Number(form.experienceYears) < 0)) {
+      return "Experience must be 0 or more";
+    }
+    return "";
   };
 
   const toggleArrayValue = (key, value) => {
@@ -132,6 +152,11 @@ export default function Teachers() {
 
   const createTeacher = async () => {
     try {
+      const validationMessage = validateTeacherForm();
+      if (validationMessage) {
+        alert(validationMessage);
+        return;
+      }
       const res = await axiosInstance.post("/admin/teacher", form);
       resetForm();
       fetchTeachers();
@@ -184,6 +209,11 @@ export default function Teachers() {
 
   const updateTeacher = async () => {
     try {
+      const validationMessage = validateTeacherForm();
+      if (validationMessage) {
+        alert(validationMessage);
+        return;
+      }
       await axiosInstance.put(`/admin/teacher/${editingId}`, form);
       resetForm();
       fetchTeachers();
@@ -288,11 +318,11 @@ export default function Teachers() {
 
         <div className="mt-6 grid gap-6">
           <div className="grid gap-4 md:grid-cols-3">
-            <Input label="Full Name" value={form.name} onChange={(e) => setField("name", e.target.value)} />
-            <Input label="Email Address" type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} />
+            <Input label="Full Name" value={form.name} onChange={(e) => setField("name", e.target.value)} required />
+            <Input label="Email Address" type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} required />
             <Input label="Primary Subject" value={form.subject} onChange={(e) => setField("subject", e.target.value)} />
-            <Input label="Mobile Number" value={form.phone} onChange={(e) => setField("phone", e.target.value)} />
-            <Input label="Alternate Mobile" value={form.alternatePhone} onChange={(e) => setField("alternatePhone", e.target.value)} />
+            <Input label="Mobile Number" type="tel" inputMode="numeric" maxLength={10} value={form.phone} onChange={(e) => setDigitsField("phone", e.target.value, 10)} />
+            <Input label="Alternate Mobile" type="tel" inputMode="numeric" maxLength={10} value={form.alternatePhone} onChange={(e) => setDigitsField("alternatePhone", e.target.value, 10)} />
             <Input label="Date of Birth" type="date" value={form.dob} onChange={(e) => setField("dob", e.target.value)} />
 
             <div>
@@ -306,9 +336,9 @@ export default function Teachers() {
             </div>
             <Input label="City" value={form.city} onChange={(e) => setField("city", e.target.value)} />
             <Input label="State" value={form.state} onChange={(e) => setField("state", e.target.value)} />
-            <Input label="Pincode" value={form.pincode} onChange={(e) => setField("pincode", e.target.value)} />
+            <Input label="Pincode" inputMode="numeric" maxLength={6} value={form.pincode} onChange={(e) => setDigitsField("pincode", e.target.value, 6)} />
             <Input label="Designation" value={form.designation} onChange={(e) => setField("designation", e.target.value)} />
-            <Input label="Experience (Years)" value={form.experienceYears} onChange={(e) => setField("experienceYears", e.target.value)} />
+            <Input label="Experience (Years)" type="number" min="0" value={form.experienceYears} onChange={(e) => setField("experienceYears", e.target.value)} />
           </div>
 
           <div>
