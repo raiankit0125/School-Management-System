@@ -8,6 +8,7 @@ import BulkUpload from "./pages/admin/BulkUpload";
 import BulkMarksUpload from "./pages/teacher/BulkMarksUpload";
 import BulkAttendanceUpload from "./pages/teacher/BulkAttendanceUpload";
 import ChatCenter from "./pages/shared/ChatCenter";
+import CalendarPage from "./pages/shared/CalendarPage";
 
 
 
@@ -16,6 +17,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Teachers from "./pages/admin/Teachers";
 import Students from "./pages/admin/Students";
 import Classes from "./pages/admin/Classes";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 
 // Teacher
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
@@ -23,6 +25,7 @@ import TeacherClasses from "./pages/teacher/TeacherClasses";
 import Attendance from "./pages/teacher/Attendance";
 import Marks from "./pages/teacher/Marks";
 import TeacherNotices from "./pages/teacher/Notices";
+import TeacherNotifications from "./pages/teacher/TeacherNotifications";
 
 // Student
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -84,6 +87,8 @@ export default function App() {
         <Route path="/admin/teachers" element={<ProtectedRoute role="ADMIN"><Teachers /></ProtectedRoute>} />
         <Route path="/admin/students" element={<ProtectedRoute role="ADMIN"><Students /></ProtectedRoute>} />
         <Route path="/admin/classes" element={<ProtectedRoute role="ADMIN"><Classes /></ProtectedRoute>} />
+        <Route path="/admin/notifications" element={<ProtectedRoute role="ADMIN"><AdminNotifications /></ProtectedRoute>} />
+        <Route path="/admin/calendar" element={<ProtectedRoute role="ADMIN"><CalendarPage /></ProtectedRoute>} />
         <Route path="/admin/chat" element={<ProtectedRoute role="ADMIN"><ChatCenter /></ProtectedRoute>} />
 
         {/* Teacher */}
@@ -92,6 +97,8 @@ export default function App() {
         <Route path="/teacher/attendance" element={<ProtectedRoute role="TEACHER"><Attendance /></ProtectedRoute>} />
         <Route path="/teacher/marks" element={<ProtectedRoute role="TEACHER"><Marks /></ProtectedRoute>} />
         <Route path="/teacher/notices" element={<ProtectedRoute role="TEACHER"><TeacherNotices /></ProtectedRoute>} />
+        <Route path="/teacher/notifications" element={<ProtectedRoute role="TEACHER"><TeacherNotifications /></ProtectedRoute>} />
+        <Route path="/teacher/calendar" element={<ProtectedRoute role="TEACHER"><CalendarPage /></ProtectedRoute>} />
         <Route path="/teacher/chat" element={<ProtectedRoute role="TEACHER"><ChatCenter /></ProtectedRoute>} />
 
         {/* Student */}
@@ -99,6 +106,7 @@ export default function App() {
         <Route path="/student/attendance" element={<ProtectedRoute role="STUDENT"><MyAttendance /></ProtectedRoute>} />
         <Route path="/student/marks" element={<ProtectedRoute role="STUDENT"><MyMarks /></ProtectedRoute>} />
         <Route path="/student/notices" element={<ProtectedRoute role="STUDENT"><StudentNotices /></ProtectedRoute>} />
+        <Route path="/student/calendar" element={<ProtectedRoute role="STUDENT"><CalendarPage /></ProtectedRoute>} />
         <Route path="/student/chat" element={<ProtectedRoute role="STUDENT"><ChatCenter /></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/" />} />

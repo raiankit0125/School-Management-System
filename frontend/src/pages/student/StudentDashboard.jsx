@@ -4,18 +4,17 @@ import PageTitle from "../../components/PageTitle";
 import axiosInstance from "../../api/axiosInstance";
 import Button from "../../components/Button";
 import { useNavigate } from "react-router-dom";
+import DashboardEvents from "../../components/DashboardEvents";
 
 export default function StudentDashboard() {
   const [profile, setProfile] = useState(null);
   const [attendance, setAttendance] = useState([]);
-  const [marks, setMarks] = useState([]);
   const [notices, setNotices] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get("/student/me").then((res) => setProfile(res.data.data));
     axiosInstance.get("/student/attendance").then((res) => setAttendance(res.data.data));
-    axiosInstance.get("/student/marks").then((res) => setMarks(res.data.data));
     axiosInstance.get("/student/notices").then((res) => setNotices(res.data.data));
   }, []);
 
@@ -43,7 +42,6 @@ export default function StudentDashboard() {
               <Button onClick={() => navigate("/student/attendance")}>View Attendance</Button>
               <Button variant="outline" onClick={() => navigate("/student/marks")}>View Marks</Button>
               <Button variant="outline" onClick={() => navigate("/student/notices")}>Open Notices</Button>
-              <Button variant="outline" onClick={() => navigate("/student/chat")}>Message Faculty</Button>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -79,6 +77,8 @@ export default function StudentDashboard() {
           <p className="mt-2 text-xl font-semibold text-slate-900">{notices.length}</p>
         </div>
       </section>
+
+      <DashboardEvents />
     </Layout>
   );
 }

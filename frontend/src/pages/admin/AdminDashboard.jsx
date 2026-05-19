@@ -3,6 +3,7 @@ import axiosInstance from "../../api/axiosInstance";
 import Layout from "../../components/Layout";
 import PageTitle from "../../components/PageTitle";
 import { Link } from "react-router-dom";
+import DashboardEvents from "../../components/DashboardEvents";
 
 const tiles = [
   {
@@ -18,10 +19,10 @@ const tiles = [
     link: "/admin/students",
   },
   {
-    title: "Communication Center",
-    copy: "Support operational communication across admin, faculty, and students from one place.",
-    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-    link: "/admin/chat",
+    title: "Academic Groups",
+    copy: "Organize classes, assign faculty, and keep student groups ready for daily workflows.",
+    image: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=900&q=80",
+    link: "/admin/classes",
   },
 ];
 
@@ -80,6 +81,8 @@ export default function AdminDashboard() {
           </Link>
         ))}
       </section>
+
+      <DashboardEvents />
     </Layout>
   );
 }

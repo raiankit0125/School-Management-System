@@ -4,6 +4,7 @@ import PageTitle from "../../components/PageTitle";
 import axiosInstance from "../../api/axiosInstance";
 import Button from "../../components/Button";
 import { useNavigate } from "react-router-dom";
+import DashboardEvents from "../../components/DashboardEvents";
 
 export default function TeacherDashboard() {
   const [profile, setProfile] = useState(null);
@@ -40,7 +41,6 @@ export default function TeacherDashboard() {
               <Button onClick={() => navigate("/teacher/attendance")}>Open Attendance</Button>
               <Button variant="outline" onClick={() => navigate("/teacher/marks")}>Open Marks</Button>
               <Button variant="outline" onClick={() => navigate("/teacher/notices")}>Send Notice</Button>
-              <Button variant="outline" onClick={() => navigate("/teacher/chat")}>Open Chat</Button>
             </div>
           </div>
 
@@ -79,6 +79,8 @@ export default function TeacherDashboard() {
           </p>
         </div>
       </section>
+
+      <DashboardEvents />
     </Layout>
   );
 }

@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Button from "./Button";
+import NotificationBell from "./NotificationBell";
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -54,7 +55,9 @@ export default function Layout({ children }) {
           { name: "Students", to: "/admin/students" },
           { name: "Bulk Upload", to: "/admin/bulk-upload" },
           { name: "Classes", to: "/admin/classes" },
-          { name: "Chat", to: "/admin/chat" },
+          { name: "Notifications", to: "/admin/notifications" },
+          { name: "Calendar", to: "/admin/calendar" },
+          { name: "Messages", to: "/admin/chat" },
         ]
       : user?.role === "TEACHER"
       ? [
@@ -65,14 +68,17 @@ export default function Layout({ children }) {
           { name: "Bulk Attendance", to: "/teacher/bulk-attendance" },
           { name: "Marks", to: "/teacher/marks" },
           { name: "Notices", to: "/teacher/notices" },
-          { name: "Chat", to: "/teacher/chat" },
+          { name: "Notifications", to: "/teacher/notifications" },
+          { name: "Calendar", to: "/teacher/calendar" },
+          { name: "Messages", to: "/teacher/chat" },
         ]
       : [
           { name: "Dashboard", to: "/student" },
           { name: "My Attendance", to: "/student/attendance" },
           { name: "My Marks", to: "/student/marks" },
           { name: "My Notices", to: "/student/notices" },
-          { name: "Chat", to: "/student/chat" },
+          { name: "Calendar", to: "/student/calendar" },
+          { name: "Messages", to: "/student/chat" },
         ];
 
   return (
@@ -152,20 +158,23 @@ export default function Layout({ children }) {
             </div>
           </div>
 
-          <Button
-            variant="danger"
-            onClick={() => {
-              logout();
-              navigate("/login");
-            }}
-          >
-            Logout
-          </Button>
+          <div className="flex items-center gap-3">
+            <NotificationBell role={user?.role} />
+            <Button
+              variant="danger"
+              onClick={() => {
+                logout();
+                navigate("/login");
+              }}
+            >
+              Logout
+            </Button>
+          </div>
         </header>
 
         <main className="p-5 lg:p-8">
           <div className="content-stage">
-            {children}
+            <div className="min-w-0">{children}</div>
           </div>
           <footer className="mt-10 rounded-[30px] border border-white/60 bg-white/80 px-6 py-6 text-sm text-slate-700 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
