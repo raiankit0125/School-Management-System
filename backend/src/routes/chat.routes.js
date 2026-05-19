@@ -1,5 +1,6 @@
 import express from "express";
 import { protect } from "../middlewares/auth.middleware.js";
+import { chatUpload } from "../middlewares/upload.middleware.js";
 import {
   getChatContacts,
   getChatThread,
@@ -12,6 +13,6 @@ router.use(protect);
 
 router.get("/contacts", getChatContacts);
 router.get("/thread/:otherUserId", getChatThread);
-router.post("/send", sendChatMessage);
+router.post("/send", chatUpload.single("attachment"), sendChatMessage);
 
 export default router;

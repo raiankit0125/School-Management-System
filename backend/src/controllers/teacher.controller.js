@@ -4,6 +4,7 @@ import { ClassModel } from "../models/Class.model.js";
 import { Attendance } from "../models/Attendance.model.js";
 import { Mark } from "../models/Mark.model.js";
 import { Notice } from "../models/Notice.model.js";
+import { SystemNotification } from "../models/SystemNotification.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { parseUploadedFile } from "../utils/parseFile.js";
 
@@ -274,6 +275,67 @@ export const sendStudentNotice = async (req, res) => {
   });
 
   return res.status(201).json(new ApiResponse(201, notice, "Notice sent"));
+};
+
+export const sendClassNotification = async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ user: req.user._id });
+    if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
+    const classId = String(req.body.classId || "").trim();
+    const studentId = String(req.body.studentId || "").trim();
+    const title = String(req.body.title || "").trim();
+    const message = String(req.body.message || "").trim();
+    const category = String(req.body.category || "ACADEMIC").trim().toUpperCase();
+
+    if (!classId || !title || !message) {
+      return res.status(400).json({ message: "classId, title and message are required" });
+    }
+
+    const allowedClass = await ClassModel.findOne({ _id: classId, teacher: teacher._id });
+    if (!allowedClass) {
+      return res.status(403).json({ message: "You can notify only your assigned class" });
+    }
+
+    const allowedCategories = ["ACADEMIC", "ASSIGNMENT", "SCHEDULE", "EXAM", "REMINDER"];
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({ message: "Invalid notification category" });
+    }
+
+    let students = [];
+    if (studentId) {
+      const student = await Student.findOne({ _id: studentId, classId }).select("user");
+      if (!student) return res.status(404).json({ message: "Student not found in this class" });
+      students = [student];
+    } else {
+      students = await Student.find({ classId }).select("user");
+    }
+
+    if (students.length === 0) {
+      return res.status(400).json({ message: "No students found for this target" });
+    }
+
+    const notifications = await SystemNotification.insertMany(
+      students.map((student) => ({
+        recipient: student.user,
+        sender: req.user._id,
+        title,
+        message,
+        type: category === "REMINDER" ? "SYSTEM" : "ANNOUNCEMENT",
+        audience: studentId ? "Selected student" : `Class ${allowedClass.name}`,
+      }))
+    );
+
+    return res.status(201).json(
+      new ApiResponse(
+        201,
+        { sentCount: notifications.length, audience: studentId ? "Selected student" : `Class ${allowedClass.name}` },
+        "Notification sent"
+      )
+    );
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 };
 
 export const getTeacherNotices = async (req, res) => {

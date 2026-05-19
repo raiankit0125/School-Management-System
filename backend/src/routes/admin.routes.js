@@ -16,6 +16,8 @@ import {
   deleteClass,
   deleteTeacher,
   deleteStudent,
+  getNotificationTargets,
+  sendAdminNotification,
 } from "../controllers/admin.controller.js";
 
 const router = express.Router();
@@ -23,6 +25,8 @@ const router = express.Router();
 router.use(protect, authorize("ADMIN"));
 
 router.get("/dashboard", getDashboard);
+router.get("/notification-targets", getNotificationTargets);
+router.post("/notifications", sendAdminNotification);
 
 router.post("/teacher", createTeacher);
 router.get("/teachers", getTeachers);

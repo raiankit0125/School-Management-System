@@ -13,6 +13,7 @@ import {
   markAttendance,
   uploadMarks,
   sendStudentNotice,
+  sendClassNotification,
   getTeacherNotices,
 } from "../controllers/teacher.controller.js";
 
@@ -31,6 +32,7 @@ router.post("/bulk/marks", upload.single("file"), bulkUploadMarks);
 router.post("/bulk/attendance", upload.single("file"), bulkUploadAttendance);
 router.get("/notices", getTeacherNotices);
 router.post("/notices", sendStudentNotice);
+router.post("/notifications", sendClassNotification);
 
 
 

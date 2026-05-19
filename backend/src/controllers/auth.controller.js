@@ -3,6 +3,7 @@ import { User } from "../models/User.model.js";
 import { Teacher } from "../models/Teacher.model.js";
 import { Student } from "../models/Student.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { isValidEmail, normalizeEmail, normalizeText } from "../utils/validation.js";
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 const ALLOWED_ROLES = ["ADMIN", "TEACHER", "STUDENT"];
@@ -10,8 +11,20 @@ const normalizeRole = (role) => (ALLOWED_ROLES.includes(role) ? role : "STUDENT"
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { password, role } = req.body;
+    const name = normalizeText(req.body.name);
+    const email = normalizeEmail(req.body.email);
     const normalizedRole = normalizeRole(role);
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "name, email and password are required" });
+    }
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Enter a valid email address" });
+    }
+    if (String(password).length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
 
     if (normalizedRole === "ADMIN") {
       const adminExists = await User.exists({ role: "ADMIN" });
@@ -54,7 +67,12 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = normalizeEmail(req.body.email);
+    const { password } = req.body;
+
+    if (!isValidEmail(email) || !password) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });

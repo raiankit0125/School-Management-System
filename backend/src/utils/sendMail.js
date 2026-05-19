@@ -19,8 +19,9 @@ export const sendMail = async ({ to, subject, html, text }) => {
   const errors = [];
 
   for (const config of configs) {
+    let transporter = null;
     try {
-      const transporter = getTransporter(config);
+      transporter = getTransporter(config);
 
       const info = await transporter.sendMail({
         from: buildFromAddress(),
@@ -29,6 +30,7 @@ export const sendMail = async ({ to, subject, html, text }) => {
         html,
         text,
       });
+      transporter.close();
 
       console.log("Mail sent to:", to);
       console.log("Message ID:", info.messageId);
@@ -36,6 +38,7 @@ export const sendMail = async ({ to, subject, html, text }) => {
 
       return info;
     } catch (error) {
+      transporter?.close();
       errors.push(`${config.host}:${config.port} ${error.message}`);
     }
   }

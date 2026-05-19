@@ -1,7 +1,5 @@
 import nodemailer from "nodemailer";
 
-const transporters = new Map();
-
 const DEFAULT_HOST = "smtp.gmail.com";
 const DEFAULT_PORT = 587;
 
@@ -27,9 +25,6 @@ const createTransportOptions = ({ host, port, service }) => ({
     pass: process.env.SMTP_PASS,
   },
   requireTLS: port !== 465,
-  pool: true,
-  maxConnections: 3,
-  maxMessages: 50,
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 15000,
@@ -63,31 +58,24 @@ export const getTransportConfigs = () => {
 };
 
 export const getTransporter = (config = getTransportConfigs()[0]) => {
-  const key = createConfigKey(config);
-
-  if (transporters.has(key)) {
-    return transporters.get(key);
-  }
-
-  const transporter = nodemailer.createTransport(createTransportOptions(config));
-  transporters.set(key, transporter);
-  return transporter;
+  return nodemailer.createTransport(createTransportOptions(config));
 };
 
-export const resetTransporters = () => {
-  transporters.clear();
-};
+export const resetTransporters = () => {};
 
 export const verifySmtpConnection = async () => {
   const configs = getTransportConfigs();
   const errors = [];
 
   for (const config of configs) {
+    let transporter = null;
     try {
-      const transporter = getTransporter(config);
+      transporter = getTransporter(config);
       await transporter.verify();
+      transporter.close();
       return true;
     } catch (error) {
+      transporter?.close();
       errors.push(`${config.host}:${config.port} ${error.message}`);
     }
   }

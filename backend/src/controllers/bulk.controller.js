@@ -9,6 +9,11 @@ import { User } from "../models/User.model.js";
 import { Teacher } from "../models/Teacher.model.js";
 import { Student } from "../models/Student.model.js";
 import { ClassModel } from "../models/Class.model.js";
+import { isValidEmail, validateOptionalPhone, validateOptionalPincode } from "../utils/validation.js";
+import {
+  createJoiningNotification,
+  syncBirthdayNotification,
+} from "../utils/systemNotifications.js";
 
 const normalize = (s = "") => String(s).trim();
 const parseList = (s = "") =>
@@ -16,8 +21,6 @@ const parseList = (s = "") =>
     .split("|")
     .map((item) => item.trim())
     .filter(Boolean);
-
-const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
 const queueBulkCredentialMail = ({ name, role, email, tempPassword }) => {
   queueMail({
@@ -93,6 +96,19 @@ export const bulkUploadTeachers = async (req, res) => {
         errors.push({ row: i + 1, email, reason: "invalid email" });
         continue;
       }
+      const phoneError = validateOptionalPhone(phone, "Mobile number");
+      const alternatePhoneError = validateOptionalPhone(alternatePhone, "Alternate mobile");
+      const pincodeError = validateOptionalPincode(pincode);
+      if (phoneError || alternatePhoneError || pincodeError) {
+        failed++;
+        errors.push({ row: i + 1, email, reason: phoneError || alternatePhoneError || pincodeError });
+        continue;
+      }
+      if (experienceYears && (!Number.isFinite(Number(experienceYears)) || Number(experienceYears) < 0)) {
+        failed++;
+        errors.push({ row: i + 1, email, reason: "experienceYears must be 0 or more" });
+        continue;
+      }
 
       // already exists
       const exists = await User.findOne({ email });
@@ -113,7 +129,7 @@ export const bulkUploadTeachers = async (req, res) => {
         mustChangePassword: true,
       });
 
-      await Teacher.create({
+      const teacher = await Teacher.create({
         user: user._id,
         subject,
         phone,
@@ -149,6 +165,9 @@ export const bulkUploadTeachers = async (req, res) => {
         signature,
         declarationDate: declarationDate || null,
       });
+
+      await createJoiningNotification({ userId: user._id, name, role: "TEACHER" });
+      await syncBirthdayNotification({ userId: user._id, name, dob: teacher.dob });
 
       queueBulkCredentialMail({
         name,
@@ -215,6 +234,14 @@ export const bulkUploadStudents = async (req, res) => {
         errors.push({ row: i + 1, email, reason: "invalid email" });
         continue;
       }
+      const phoneError = validateOptionalPhone(phone, "Phone");
+      const guardianPhoneError = validateOptionalPhone(guardianPhone, "Guardian phone");
+      const pincodeError = validateOptionalPincode(pincode);
+      if (phoneError || guardianPhoneError || pincodeError) {
+        failed++;
+        errors.push({ row: i + 1, email, reason: phoneError || guardianPhoneError || pincodeError });
+        continue;
+      }
 
       const exists = await User.findOne({ email });
       if (exists) {
@@ -237,7 +264,7 @@ export const bulkUploadStudents = async (req, res) => {
         mustChangePassword: true,
       });
 
-      await Student.create({
+      const student = await Student.create({
         user: user._id,
         classId: cls._id,
         rollNo,
@@ -257,6 +284,9 @@ export const bulkUploadStudents = async (req, res) => {
         transportMode,
         notes,
       });
+
+      await createJoiningNotification({ userId: user._id, name, role: "STUDENT" });
+      await syncBirthdayNotification({ userId: user._id, name, dob: student.dob });
 
       queueBulkCredentialMail({
         name,

@@ -4,6 +4,7 @@ import { Teacher } from "../models/Teacher.model.js";
 import { Student } from "../models/Student.model.js";
 import { ClassModel } from "../models/Class.model.js";
 import { ChatMessage } from "../models/ChatMessage.model.js";
+import { SystemNotification } from "../models/SystemNotification.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 const getAllowedContactIds = async (user) => {
@@ -69,11 +70,13 @@ export const getChatThread = async (req, res) => {
 };
 
 export const sendChatMessage = async (req, res) => {
-  const { recipientId, body } = req.body;
+  const { recipientId } = req.body;
+  const body = String(req.body.body || "").trim();
   const allowedIds = await getAllowedContactIds(req.user);
+  const hasAttachment = Boolean(req.file);
 
-  if (!recipientId || !body?.trim()) {
-    return res.status(400).json({ message: "recipientId and body are required" });
+  if (!recipientId || (!body && !hasAttachment)) {
+    return res.status(400).json({ message: "recipientId and message or file are required" });
   }
 
   if (!allowedIds.includes(String(recipientId))) {
@@ -87,12 +90,29 @@ export const sendChatMessage = async (req, res) => {
   const message = await ChatMessage.create({
     sender: req.user._id,
     recipient: recipientId,
-    body: body.trim(),
+    body,
+    attachment: hasAttachment
+      ? {
+          filename: req.file.originalname,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+          dataUrl: `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+        }
+      : undefined,
   });
 
   const populated = await ChatMessage.findById(message._id)
     .populate("sender", "name role email")
     .populate("recipient", "name role email");
+
+  await SystemNotification.create({
+    recipient: recipientId,
+    sender: req.user._id,
+    title: `New message from ${req.user.name}`,
+    message: body || `Sent an attachment: ${req.file.originalname}`,
+    type: "MESSAGE",
+    audience: "Messages",
+  });
 
   return res.status(201).json(new ApiResponse(201, populated, "Message sent"));
 };
