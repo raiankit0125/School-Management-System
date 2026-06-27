@@ -4,6 +4,7 @@ import PageTitle from "../../components/PageTitle";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import Table from "../../components/Table";
+import ProfileImagePicker from "../../components/ProfileImagePicker";
 import axiosInstance from "../../api/axiosInstance";
 import { digitsOnly, isEmail, validatePhone, validatePincode } from "../../utils/formValidation";
 
@@ -13,6 +14,8 @@ const QUALIFICATION_OPTIONS = ["B.Sc", "M.Sc", "B.Ed", "M.Ed", "Others"];
 const createInitialForm = () => ({
   name: "",
   email: "",
+  profileImage: null,
+  removeProfileImage: false,
   subject: "",
   phone: "",
   alternatePhone: "",
@@ -81,6 +84,22 @@ function DetailItem({ label, value }) {
   );
 }
 
+const appendFormFields = (form) => {
+  const formData = new FormData();
+  Object.entries(form).forEach(([key, value]) => {
+    if (key === "profileImage") {
+      if (value) formData.append(key, value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach((item) => formData.append(key, item));
+      return;
+    }
+    formData.append(key, value ?? "");
+  });
+  return formData;
+};
+
 export default function Teachers() {
   const [teachers, setTeachers] = useState([]);
   const [search, setSearch] = useState("");
@@ -137,17 +156,15 @@ export default function Teachers() {
   const buildCredentialAlert = (label, responseData) => {
     const credentials = responseData?.data?.credentials;
 
-    if (!credentials?.tempPassword) {
-      return `${label} successfully`;
-    }
-
     const mailNote = credentials.emailSent === false
-      ? `\nMail issue: ${credentials.mailError || "Email could not be delivered"}`
+      ? ` Mail issue: ${credentials.mailError || "Email could not be delivered"}`
       : credentials.mailQueued
-        ? "\nEmail has been queued in background."
-        : "\nEmail sent successfully.";
+        ? " Credentials email has been queued."
+        : credentials.emailSent
+          ? " Credentials email sent successfully."
+          : "";
 
-    return `${label} successfully\nEmail: ${credentials.email}\nTemporary Password: ${credentials.tempPassword}${mailNote}`;
+    return `${label} successfully.${mailNote}`;
   };
 
   const createTeacher = async () => {
@@ -157,7 +174,9 @@ export default function Teachers() {
         alert(validationMessage);
         return;
       }
-      const res = await axiosInstance.post("/admin/teacher", form);
+      const res = await axiosInstance.post("/admin/teacher", appendFormFields(form), {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       resetForm();
       fetchTeachers();
       alert(buildCredentialAlert("Faculty added", res.data));
@@ -178,6 +197,8 @@ export default function Teachers() {
     setForm({
       name: teacher?.user?.name || "",
       email: teacher?.user?.email || "",
+      profileImage: null,
+      removeProfileImage: false,
       subject: teacher?.subject || "",
       phone: teacher?.phone || "",
       alternatePhone: teacher?.alternatePhone || "",
@@ -214,7 +235,9 @@ export default function Teachers() {
         alert(validationMessage);
         return;
       }
-      await axiosInstance.put(`/admin/teacher/${editingId}`, form);
+      await axiosInstance.put(`/admin/teacher/${editingId}`, appendFormFields(form), {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       resetForm();
       fetchTeachers();
       alert("Faculty updated successfully");
@@ -317,6 +340,21 @@ export default function Teachers() {
         </div>
 
         <div className="mt-6 grid gap-6">
+          <ProfileImagePicker
+            name={form.name}
+            imageUrl={selectedTeacher?.user?.profileImage || ""}
+            file={form.profileImage}
+            removed={form.removeProfileImage}
+            onChange={(file) => {
+              setField("profileImage", file);
+              setField("removeProfileImage", false);
+            }}
+            onRemove={() => {
+              setField("profileImage", null);
+              setField("removeProfileImage", true);
+            }}
+          />
+
           <div className="grid gap-4 md:grid-cols-3">
             <Input label="Full Name" value={form.name} onChange={(e) => setField("name", e.target.value)} required />
             <Input label="Email Address" type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} required />
@@ -499,6 +537,13 @@ export default function Teachers() {
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="label">Faculty Details</p>
+              {selectedTeacher?.user?.profileImage ? (
+                <img
+                  src={selectedTeacher.user.profileImage}
+                  alt={selectedTeacher?.user?.name || "Faculty"}
+                  className="mt-3 h-24 w-24 rounded-full object-cover"
+                />
+              ) : null}
               <h3 className="mt-2 text-2xl font-semibold text-slate-900">
                 {selectedTeacher?.user?.name}
               </h3>
@@ -538,7 +583,18 @@ export default function Teachers() {
       <section className="mt-6">
         <Table
           columns={[
-            { key: "name", title: "Faculty", render: (teacher) => teacher?.user?.name || "-" },
+            {
+              key: "name",
+              title: "Faculty",
+              render: (teacher) => (
+                <div className="flex items-center gap-3">
+                  {teacher?.user?.profileImage ? (
+                    <img src={teacher.user.profileImage} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  ) : null}
+                  <span>{teacher?.user?.name || "-"}</span>
+                </div>
+              ),
+            },
             { key: "email", title: "Email", render: (teacher) => teacher?.user?.email || "-" },
             { key: "subject", title: "Primary Subject", render: (teacher) => teacher?.subject || "-" },
             { key: "qualification", title: "Qualification", render: (teacher) => teacher?.qualification || "-" },

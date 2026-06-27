@@ -4,12 +4,21 @@ import PageTitle from "../../components/PageTitle";
 import Button from "../../components/Button";
 import axiosInstance from "../../api/axiosInstance";
 
+const initialsFromName = (name = "") =>
+  String(name || "U")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "U";
+
 export default function ChatCenter() {
   const [contacts, setContacts] = useState([]);
   const [activeContact, setActiveContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [body, setBody] = useState("");
   const [file, setFile] = useState(null);
+  const [contactSearch, setContactSearch] = useState("");
 
   const fetchContacts = async () => {
     const res = await axiosInstance.get("/chat/contacts");
@@ -82,6 +91,16 @@ export default function ChatCenter() {
     );
   };
 
+  const filteredContacts = contacts.filter((contact) => {
+    const q = contactSearch.trim().toLowerCase();
+    if (!q) return true;
+    return [contact.name, contact.email, contact.role]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(q);
+  });
+
   return (
     <Layout>
       <PageTitle
@@ -100,11 +119,22 @@ export default function ChatCenter() {
               {contacts.length}
             </span>
           </div>
+          <div className="mt-4">
+            <label className="label">Search</label>
+            <input
+              className="input-field mt-1"
+              value={contactSearch}
+              onChange={(event) => setContactSearch(event.target.value)}
+              placeholder="Search name, email, role"
+            />
+          </div>
           <div className="mt-4 space-y-3">
             {contacts.length === 0 ? (
               <p className="text-sm text-slate-500">No chat contacts available.</p>
+            ) : filteredContacts.length === 0 ? (
+              <p className="text-sm text-slate-500">No contacts match your search.</p>
             ) : (
-              contacts.map((contact) => (
+              filteredContacts.map((contact) => (
                 <button
                   key={contact._id}
                   type="button"
@@ -115,9 +145,20 @@ export default function ChatCenter() {
                       : "border-slate-200 bg-white hover:border-slate-300"
                   }`}
                 >
-                  <p className="text-sm font-semibold text-slate-900">{contact.name}</p>
-                  <p className="text-xs uppercase tracking-wider text-slate-500">{contact.role}</p>
-                  <p className="mt-1 text-xs text-slate-500">{contact.email}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-sm font-semibold text-slate-500 ring-1 ring-slate-200">
+                      {contact.profileImage ? (
+                        <img src={contact.profileImage} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        initialsFromName(contact.name)
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-900">{contact.name}</p>
+                      <p className="text-xs uppercase tracking-wider text-slate-500">{contact.role}</p>
+                      <p className="mt-1 truncate text-xs text-slate-500">{contact.email}</p>
+                    </div>
+                  </div>
                 </button>
               ))
             )}
@@ -126,12 +167,25 @@ export default function ChatCenter() {
 
         <section className="card flex min-h-[640px] flex-col p-6">
           <div className="border-b border-slate-200 pb-4">
-            <h3 className="text-xl font-semibold text-slate-900">
-              {activeContact?.name || "Select a contact"}
-            </h3>
-            <p className="mt-1 text-sm text-slate-500">
-              {activeContact ? `${activeContact.role} conversation thread` : "Choose someone from the left panel"}
-            </p>
+            <div className="flex items-center gap-3">
+              {activeContact ? (
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 font-semibold text-slate-500 ring-1 ring-slate-200">
+                  {activeContact.profileImage ? (
+                    <img src={activeContact.profileImage} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    initialsFromName(activeContact.name)
+                  )}
+                </div>
+              ) : null}
+              <div>
+                <h3 className="text-xl font-semibold text-slate-900">
+                  {activeContact?.name || "Select a contact"}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">
+                  {activeContact ? `${activeContact.role} conversation thread` : "Choose someone from the left panel"}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="mt-4 flex-1 space-y-3 overflow-auto rounded-3xl bg-slate-50 p-4">

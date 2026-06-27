@@ -28,9 +28,9 @@ export default function BulkUpload() {
         "Ankit Sharma,ankit@gmail.com,10-A,13,9999999999,Ghaziabad,2011-08-20,Male,Ghaziabad,UP,201010,Sunita Sharma,9811100000,ADM-1002,A,Bright Future School,Allergy alert,Van,Needs scholarship review\n";
 
     const teacherTemplate =
-        "name,email,subject,phone,alternatePhone,dob,gender,address,city,state,pincode,qualification,specialization,certifications,experienceYears,designation,institutions,onlineExperience,onlineExperienceDetails,devices,techRating,demoReady,demoTopic,whyBst,comments,declarationAccepted,signature,declarationDate\n" +
-        "Mr Raj,raj@gmail.com,Mathematics,9000000000,9000000001,1990-04-15,Male,Delhi NCR,Noida,UP,201301,M.Sc,Algebra,TET Certified,8,Senior Faculty,City School,Yes,Zoom and Meet batches,Laptop / Desktop|Tablet,5,Yes,Quadratic Equations,Looking for strong academic culture,Available immediately,true,Raj Kumar,2026-03-07\n" +
-        "Ms Neha,neha@gmail.com,Science,9111111111,9111111112,1992-09-11,Female,Ghaziabad,Ghaziabad,UP,201010,B.Ed,Biology,CTET,5,Faculty,Bright School,Yes,Handled online science lab demos,Laptop / Desktop|Smartphone,4,Yes,Cell Structure,Interested in blended teaching,Part time support,true,Neha Sharma,2026-03-07\n";
+        "name,email,subject,phone,alternatePhone,dob,gender,address,city,state,pincode,qualification,specialization,certifications,certificates,subjects,preferredClasses,experienceYears,designation,institutions,onlineExperience,onlineExperienceDetails,preferredTimings,timeSlots,hoursPerWeek,devices,internetOptions,techRating,demoReady,demoTopic,whyBst,comments,declarationAccepted,signature,declarationDate\n" +
+        "Mr Raj,raj@gmail.com,Mathematics,9000000000,9000000001,1990-04-15,Male,Delhi NCR,Noida,UP,201301,M.Sc,Algebra,TET Certified,Degree PDF,Mathematics|Physics,9-A|10-A,8,Senior Faculty,City School,Yes,Zoom and Meet batches,Evening|Weekend,5 PM - 8 PM,12,Laptop / Desktop|Tablet,Broadband|Mobile Data,5,Yes,Quadratic Equations,Looking for strong academic culture,Available immediately,true,Raj Kumar,2026-03-07\n" +
+        "Ms Neha,neha@gmail.com,Science,9111111111,9111111112,1992-09-11,Female,Ghaziabad,Ghaziabad,UP,201010,B.Ed,Biology,CTET,Certificate Link,Science|Biology,8-A|9-A,5,Faculty,Bright School,Yes,Handled online science lab demos,Morning,9 AM - 12 PM,10,Laptop / Desktop|Smartphone,Broadband,4,Yes,Cell Structure,Interested in blended teaching,Part time support,true,Neha Sharma,2026-03-07\n";
 
     const downloadTemplate = () => {
         if (type === "students") downloadCSV("students_template.csv", studentTemplate);
@@ -39,7 +39,7 @@ export default function BulkUpload() {
 
     const uploadFile = async () => {
         if (!file) {
-            alert("Please choose a CSV file first");
+            alert("Please choose a CSV or Excel file first");
             return;
         }
 
@@ -57,7 +57,7 @@ export default function BulkUpload() {
             });
 
             setReport(res.data.data);
-            alert("Bulk upload completed ✅");
+            alert("Bulk upload completed");
         } catch (err) {
             console.log("BULK UPLOAD ERROR:", err?.response?.data);
             alert(err?.response?.data?.message || "Upload failed");
@@ -110,7 +110,7 @@ export default function BulkUpload() {
                     </div>
 
                     <div>
-                        <label className="label">CSV File</label>
+                        <label className="label">CSV or Excel File</label>
                         <input
                             type="file"
                             accept=".csv,.xlsx,.xls"

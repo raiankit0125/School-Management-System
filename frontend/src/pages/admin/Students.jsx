@@ -4,12 +4,15 @@ import PageTitle from "../../components/PageTitle";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import Table from "../../components/Table";
+import ProfileImagePicker from "../../components/ProfileImagePicker";
 import axiosInstance from "../../api/axiosInstance";
 import { digitsOnly, isEmail, validatePhone, validatePincode } from "../../utils/formValidation";
 
 const createInitialForm = () => ({
   name: "",
   email: "",
+  profileImage: null,
+  removeProfileImage: false,
   classId: "",
   rollNo: "",
   phone: "",
@@ -37,6 +40,18 @@ function DetailItem({ label, value }) {
     </div>
   );
 }
+
+const appendFormFields = (form) => {
+  const formData = new FormData();
+  Object.entries(form).forEach(([key, value]) => {
+    if (key === "profileImage") {
+      if (value) formData.append(key, value);
+      return;
+    }
+    formData.append(key, value ?? "");
+  });
+  return formData;
+};
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -87,17 +102,15 @@ export default function Students() {
   const buildCredentialAlert = (label, responseData) => {
     const credentials = responseData?.data?.credentials;
 
-    if (!credentials?.tempPassword) {
-      return `${label} successfully`;
-    }
-
     const mailNote = credentials.emailSent === false
-      ? `\nMail issue: ${credentials.mailError || "Email could not be delivered"}`
+      ? ` Mail issue: ${credentials.mailError || "Email could not be delivered"}`
       : credentials.mailQueued
-        ? "\nEmail has been queued in background."
-        : "\nEmail sent successfully.";
+        ? " Credentials email has been queued."
+        : credentials.emailSent
+          ? " Credentials email sent successfully."
+          : "";
 
-    return `${label} successfully\nEmail: ${credentials.email}\nTemporary Password: ${credentials.tempPassword}${mailNote}`;
+    return `${label} successfully.${mailNote}`;
   };
 
   const createStudent = async () => {
@@ -107,7 +120,9 @@ export default function Students() {
         alert(validationMessage);
         return;
       }
-      const res = await axiosInstance.post("/admin/student", form);
+      const res = await axiosInstance.post("/admin/student", appendFormFields(form), {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       resetForm();
       fetchData();
       alert(buildCredentialAlert("Student added", res.data));
@@ -128,6 +143,8 @@ export default function Students() {
     setForm({
       name: student?.user?.name || "",
       email: student?.user?.email || "",
+      profileImage: null,
+      removeProfileImage: false,
       classId: student?.classId?._id || "",
       rollNo: student?.rollNo || "",
       phone: student?.phone || "",
@@ -155,7 +172,9 @@ export default function Students() {
         alert(validationMessage);
         return;
       }
-      await axiosInstance.put(`/admin/student/${editingId}`, form);
+      await axiosInstance.put(`/admin/student/${editingId}`, appendFormFields(form), {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       resetForm();
       fetchData();
       alert("Student updated successfully");
@@ -262,6 +281,21 @@ export default function Students() {
         </div>
 
         <div className="mt-6 grid gap-6">
+          <ProfileImagePicker
+            name={form.name}
+            imageUrl={selectedStudent?.user?.profileImage || ""}
+            file={form.profileImage}
+            removed={form.removeProfileImage}
+            onChange={(file) => {
+              setField("profileImage", file);
+              setField("removeProfileImage", false);
+            }}
+            onRemove={() => {
+              setField("profileImage", null);
+              setField("removeProfileImage", true);
+            }}
+          />
+
           <div className="grid gap-4 md:grid-cols-3">
             <Input label="Student Name" value={form.name} onChange={(e) => setField("name", e.target.value)} required />
             <Input label="Email Address" type="email" value={form.email} onChange={(e) => setField("email", e.target.value)} required />
@@ -364,6 +398,13 @@ export default function Students() {
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="label">Student Details</p>
+              {selectedStudent?.user?.profileImage ? (
+                <img
+                  src={selectedStudent.user.profileImage}
+                  alt={selectedStudent?.user?.name || "Student"}
+                  className="mt-3 h-24 w-24 rounded-full object-cover"
+                />
+              ) : null}
               <h3 className="mt-2 text-2xl font-semibold text-slate-900">
                 {selectedStudent?.user?.name}
               </h3>
@@ -398,7 +439,18 @@ export default function Students() {
       <section className="mt-6">
         <Table
           columns={[
-            { key: "name", title: "Student", render: (student) => student?.user?.name || "-" },
+            {
+              key: "name",
+              title: "Student",
+              render: (student) => (
+                <div className="flex items-center gap-3">
+                  {student?.user?.profileImage ? (
+                    <img src={student.user.profileImage} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  ) : null}
+                  <span>{student?.user?.name || "-"}</span>
+                </div>
+              ),
+            },
             { key: "email", title: "Email", render: (student) => student?.user?.email || "-" },
             { key: "class", title: "Class", render: (student) => student?.classId?.name || "-" },
             { key: "rollNo", title: "Roll No", render: (student) => student?.rollNo || "-" },

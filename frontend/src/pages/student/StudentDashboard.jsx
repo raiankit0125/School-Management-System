@@ -5,6 +5,7 @@ import axiosInstance from "../../api/axiosInstance";
 import Button from "../../components/Button";
 import { useNavigate } from "react-router-dom";
 import DashboardEvents from "../../components/DashboardEvents";
+import ProfilePhotoManager from "../../components/ProfilePhotoManager";
 
 export default function StudentDashboard() {
   const [profile, setProfile] = useState(null);
@@ -60,6 +61,10 @@ export default function StudentDashboard() {
       </section>
 
       <section className="mt-6 grid gap-6 md:grid-cols-4">
+        <ProfilePhotoManager
+          profile={profile}
+          onUpdated={(user) => setProfile((current) => ({ ...(current || {}), user }))}
+        />
         <div className="metric-card">
           <p className="text-sm text-slate-500">Academic Group</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">{profile?.classId?.name || "-"}</p>
