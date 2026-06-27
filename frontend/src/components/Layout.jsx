@@ -1,11 +1,13 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Button from "./Button";
 import NotificationBell from "./NotificationBell";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const shellClass =
     user?.role === "ADMIN"
@@ -82,7 +84,7 @@ export default function Layout({ children }) {
         ];
 
   return (
-    <div className={`app-shell ${shellClass} relative flex`}>
+    <div className={`app-shell ${shellClass} relative flex w-full min-w-0 overflow-x-hidden`}>
       <div className="workspace-backdrop">
         <div
           className="workspace-backdrop-image"
@@ -142,39 +144,58 @@ export default function Layout({ children }) {
       </aside>
 
       {/* Main */}
-      <div className="relative flex-1">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         {/* Navbar */}
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/45 bg-white/70 px-6 py-4 backdrop-blur-xl">
-          <div>
-            <h1 className="text-lg font-semibold text-slate-900">{user?.role} Workspace</h1>
-            <p className="text-sm text-slate-600">{user?.name}</p>
-          </div>
-
-          <div className="hidden items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/75 px-3 py-2 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.4)] md:flex">
-            <img src={roleVisual.image} alt={roleVisual.label} className="h-11 w-11 rounded-2xl object-cover" />
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{roleVisual.label}</p>
-              <p className="text-sm font-semibold text-slate-800">{user?.role}</p>
+        <header className="sticky top-0 z-10 w-full border-b border-white/45 bg-white/70 px-3 py-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/70 sm:px-6 sm:py-4">
+          <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold text-slate-900 sm:text-lg">{user?.role} Workspace</h1>
+              <p className="truncate text-sm text-slate-600">{user?.name}</p>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <NotificationBell role={user?.role} />
-            <Button
-              variant="danger"
-              onClick={() => {
-                logout();
-                navigate("/login");
-              }}
-            >
-              Logout
-            </Button>
+            <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+              <select
+                className="select-field min-w-0 lg:hidden"
+                value={links.find((link) => link.to === location.pathname)?.to || ""}
+                onChange={(event) => event.target.value && navigate(event.target.value)}
+              >
+                <option value="">Open section</option>
+                {links.map((link) => (
+                  <option key={link.to} value={link.to}>
+                    {link.name}
+                  </option>
+                ))}
+              </select>
+
+              <div className="hidden items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/75 px-3 py-2 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.4)] md:flex">
+                <img src={roleVisual.image} alt={roleVisual.label} className="h-11 w-11 rounded-2xl object-cover" />
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{roleVisual.label}</p>
+                  <p className="text-sm font-semibold text-slate-800">{user?.role}</p>
+                </div>
+              </div>
+
+              <div className="flex min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-3">
+                <ThemeToggle />
+                <NotificationBell role={user?.role} />
+                <Button
+                  variant="danger"
+                  className="whitespace-nowrap"
+                  onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}
+                >
+                  Logout
+                </Button>
+              </div>
+            </div>
           </div>
         </header>
 
-        <main className="p-5 lg:p-8">
+        <main className="w-full min-w-0 overflow-x-hidden p-3 sm:p-5 lg:p-8">
           <div className="content-stage">
-            <div className="min-w-0">{children}</div>
+            <div className="min-w-0 max-w-full">{children}</div>
           </div>
           <footer className="mt-10 rounded-[30px] border border-white/60 bg-white/80 px-6 py-6 text-sm text-slate-700 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">

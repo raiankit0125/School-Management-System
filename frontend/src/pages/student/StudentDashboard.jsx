@@ -10,12 +10,14 @@ import ProfilePhotoManager from "../../components/ProfilePhotoManager";
 export default function StudentDashboard() {
   const [profile, setProfile] = useState(null);
   const [attendance, setAttendance] = useState([]);
+  const [attendanceSummary, setAttendanceSummary] = useState(null);
   const [notices, setNotices] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     axiosInstance.get("/student/me").then((res) => setProfile(res.data.data));
     axiosInstance.get("/student/attendance").then((res) => setAttendance(res.data.data));
+    axiosInstance.get("/student/attendance-summary").then((res) => setAttendanceSummary(res.data.data));
     axiosInstance.get("/student/notices").then((res) => setNotices(res.data.data));
   }, []);
 
@@ -76,6 +78,9 @@ export default function StudentDashboard() {
         <div className="metric-card">
           <p className="text-sm text-slate-500">Attendance Present</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">{presentCount}</p>
+          <p className={`mt-1 text-sm font-semibold ${(attendanceSummary?.percentage || 0) < 75 ? "text-rose-600" : "text-emerald-600"}`}>
+            {attendanceSummary?.percentage ?? 0}% attendance
+          </p>
         </div>
         <div className="metric-card">
           <p className="text-sm text-slate-500">Notices</p>

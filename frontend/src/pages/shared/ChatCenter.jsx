@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import PageTitle from "../../components/PageTitle";
 import Button from "../../components/Button";
@@ -20,27 +20,27 @@ export default function ChatCenter() {
   const [file, setFile] = useState(null);
   const [contactSearch, setContactSearch] = useState("");
 
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     const res = await axiosInstance.get("/chat/contacts");
     setContacts(res.data.data);
     if (!activeContact && res.data.data.length > 0) {
       setActiveContact(res.data.data[0]);
     }
-  };
+  }, [activeContact]);
 
-  const fetchThread = async (userId) => {
+  const fetchThread = useCallback(async (userId) => {
     if (!userId) return;
     const res = await axiosInstance.get(`/chat/thread/${userId}`);
     setMessages(res.data.data);
-  };
-
-  useEffect(() => {
-    fetchContacts();
   }, []);
 
   useEffect(() => {
-    if (activeContact?._id) fetchThread(activeContact._id);
-  }, [activeContact?._id]);
+    Promise.resolve().then(fetchContacts);
+  }, [fetchContacts]);
+
+  useEffect(() => {
+    if (activeContact?._id) Promise.resolve().then(() => fetchThread(activeContact._id));
+  }, [activeContact?._id, fetchThread]);
 
   const sendMessage = async () => {
     if (!activeContact?._id || (!body.trim() && !file)) return;

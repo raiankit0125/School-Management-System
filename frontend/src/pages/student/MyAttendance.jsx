@@ -6,9 +6,11 @@ import axiosInstance from "../../api/axiosInstance";
 
 export default function MyAttendance() {
   const [data, setData] = useState([]);
+  const [summary, setSummary] = useState(null);
 
   useEffect(() => {
     axiosInstance.get("/student/attendance").then((res) => setData(res.data.data));
+    axiosInstance.get("/student/attendance-summary").then((res) => setSummary(res.data.data));
   }, []);
 
   return (
@@ -24,9 +26,20 @@ export default function MyAttendance() {
               Review your date-wise attendance records and keep an eye on your academic consistency throughout the term.
             </p>
           </div>
+          <div className="grid gap-4 sm:grid-cols-2">
           <div className="metric-card">
             <p className="label">Attendance Entries</p>
             <p className="mt-3 text-4xl font-semibold text-slate-900">{data.length}</p>
+          </div>
+            <div className="metric-card">
+              <p className="label">Current Percentage</p>
+              <p className={`mt-3 text-4xl font-semibold ${(summary?.percentage || 0) < 75 ? "text-rose-600" : "text-emerald-600"}`}>
+                {summary?.percentage ?? 0}%
+              </p>
+              <p className="mt-2 text-sm text-slate-500">
+                {summary?.present || 0} present of {summary?.totalMarkedDays || 0} marked days
+              </p>
+            </div>
           </div>
         </div>
       </section>

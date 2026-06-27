@@ -21,6 +21,15 @@
     background-color: var(--bg-ivory);
   }
 
+  .dark {
+    color-scheme: dark;
+  }
+
+  .dark body {
+    color: #e5edf8;
+    background-color: #07111f;
+  }
+
   h1,
   h2,
   h3,
@@ -34,7 +43,7 @@
 
 @layer components {
   .app-shell {
-    @apply min-h-screen;
+    @apply min-h-screen w-full min-w-0;
     background-image:
       radial-gradient(circle at 10% 12%, rgba(217, 236, 255, 0.9), transparent 28%),
       radial-gradient(circle at 92% 8%, rgba(253, 231, 216, 0.92), transparent 30%),
@@ -92,11 +101,11 @@
   }
 
   .content-stage {
-    @apply rounded-[34px] border border-white/30 bg-white/10 p-3 backdrop-blur-[2px];
+    @apply w-full min-w-0 max-w-full rounded-[34px] border border-white/30 bg-white/10 p-3 backdrop-blur-[2px];
   }
 
   .card {
-    @apply rounded-[28px] border border-white/25 bg-white/80 shadow-[0_22px_60px_-34px_rgba(15,23,42,0.38)] backdrop-blur;
+    @apply w-full min-w-0 max-w-full rounded-[28px] border border-white/25 bg-white/80 shadow-[0_22px_60px_-34px_rgba(15,23,42,0.38)] backdrop-blur;
   }
 
   .card-solid {
@@ -108,7 +117,7 @@
   }
 
   .hero-panel {
-    @apply relative overflow-hidden rounded-[34px] border border-white/40 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.55)];
+    @apply relative w-full min-w-0 max-w-full overflow-hidden rounded-[34px] border border-white/40 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.55)];
   }
 
   .btn {
@@ -140,7 +149,7 @@
   }
 
   .table-wrap {
-    @apply overflow-hidden rounded-[28px] border border-white/70 bg-white/90 shadow-[0_20px_55px_-34px_rgba(15,23,42,0.35)];
+    @apply w-full max-w-full overflow-x-auto rounded-[28px] border border-white/70 bg-white/90 shadow-[0_20px_55px_-34px_rgba(15,23,42,0.35)];
   }
 
   .table-head {
@@ -148,7 +157,7 @@
   }
 
   .metric-card {
-    @apply rounded-[26px] border border-white/25 bg-white/80 p-5 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.35)] backdrop-blur;
+    @apply min-w-0 rounded-[26px] border border-white/25 bg-white/80 p-5 shadow-[0_18px_45px_-34px_rgba(15,23,42,0.35)] backdrop-blur;
   }
 
   .sidebar-link {
@@ -165,6 +174,139 @@
 
   .role-visual-card {
     @apply rounded-[28px] border border-white/20 bg-white/10 p-4 shadow-[0_22px_50px_-36px_rgba(15,23,42,0.4)] backdrop-blur;
+  }
+
+  .dark .app-shell,
+  .dark .app-shell-admin,
+  .dark .app-shell-teacher,
+  .dark .app-shell-student {
+    background-image:
+      radial-gradient(circle at 12% 12%, rgba(20, 184, 166, 0.16), transparent 28%),
+      radial-gradient(circle at 88% 10%, rgba(96, 165, 250, 0.14), transparent 30%),
+      linear-gradient(180deg, #07111f 0%, #0f172a 100%);
+  }
+
+  .dark .workspace-backdrop-tint {
+    background:
+      linear-gradient(180deg, rgba(2, 6, 23, 0.84) 0%, rgba(8, 13, 28, 0.78) 100%),
+      radial-gradient(circle at top left, rgba(20, 184, 166, 0.16), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.12), transparent 28%);
+  }
+
+  .dark .content-stage,
+  .dark .card,
+  .dark .card-solid,
+  .dark .metric-card,
+  .dark .table-wrap {
+    @apply border-slate-700/70 bg-slate-900/80 text-slate-100 shadow-[0_22px_60px_-34px_rgba(0,0,0,0.65)];
+  }
+
+  .dark .hero-panel {
+    @apply border-slate-700/70;
+  }
+
+  .dark .input-field,
+  .dark .select-field {
+    @apply border-slate-700 bg-slate-950/80 text-slate-100 focus:border-cyan-400 focus:ring-cyan-400/20;
+  }
+
+  .dark .input-field::placeholder,
+  .dark .select-field::placeholder {
+    color: #64748b;
+  }
+
+  .dark .btn-outline {
+    @apply border-slate-700 bg-slate-900/80 text-slate-100 hover:bg-slate-800;
+  }
+
+  .dark .label,
+  .dark .table-head {
+    @apply text-slate-400;
+  }
+
+  .dark .text-slate-900,
+  .dark .text-slate-800 {
+    color: #f8fafc;
+  }
+
+  .dark .text-slate-700,
+  .dark .text-slate-600,
+  .dark .text-slate-500 {
+    color: #cbd5e1;
+  }
+
+  .dark .bg-white,
+  .dark .bg-white\/80,
+  .dark .bg-white\/90,
+  .dark .bg-white\/75,
+  .dark .bg-slate-50,
+  .dark .bg-slate-50\/80 {
+    background-color: rgba(15, 23, 42, 0.82);
+  }
+
+  .dark .border-slate-100,
+  .dark .border-slate-200,
+  .dark .border-slate-200\/70,
+  .dark .border-slate-200\/80 {
+    border-color: rgba(51, 65, 85, 0.9);
+  }
+
+  @media (max-width: 640px) {
+    html,
+    body,
+    #root {
+      width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+    }
+
+    .content-stage {
+      border-radius: 20px !important;
+      padding: 0.5rem !important;
+    }
+
+    .hero-panel,
+    .card,
+    .card-solid,
+    .metric-card,
+    .glass-panel,
+    .table-wrap {
+      border-radius: 20px !important;
+    }
+
+    .hero-panel {
+      padding: 1rem !important;
+    }
+
+    .metric-card {
+      padding: 1rem !important;
+    }
+
+    .hero-panel h2,
+    .hero-panel h3 {
+      font-size: 1.35rem;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .hero-panel p,
+    .card p,
+    .metric-card p {
+      overflow-wrap: anywhere;
+    }
+
+    .btn {
+      min-height: 2.5rem;
+      padding-left: 0.85rem;
+      padding-right: 0.85rem;
+    }
+
+    img,
+    video,
+    canvas,
+    table {
+      max-width: 100%;
+    }
   }
 }
 
