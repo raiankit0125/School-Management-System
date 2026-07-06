@@ -79,6 +79,26 @@ const pages = {
 
 export default function PublicInfoPage({ type }) {
   const page = pages[type] || pages.about;
+  const isContact = type === "contact";
+
+  const sendQuery = (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const name = String(form.get("name") || "").trim();
+    const email = String(form.get("email") || "").trim();
+    const subject = String(form.get("subject") || "Portal Query").trim();
+    const message = String(form.get("message") || "").trim();
+
+    const body = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      "",
+      "Query:",
+      message,
+    ].join("\n");
+
+    window.location.href = `mailto:raiankit0125@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
 
   return (
     <div className="app-shell login-shell flex min-h-screen flex-col px-4 py-8">
@@ -118,6 +138,24 @@ export default function PublicInfoPage({ type }) {
               </div>
             ))}
           </div>
+
+          {isContact ? (
+            <form onSubmit={sendQuery} className="mt-8 rounded-[24px] border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900/80">
+              <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Send us a note</h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                Fill your query below. It will open your email app with the message ready to send.
+              </p>
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <input name="name" className="input-field" placeholder="Your name" required />
+                <input name="email" type="email" className="input-field" placeholder="Your email" required />
+                <input name="subject" className="input-field md:col-span-2" placeholder="Subject" defaultValue="Portal Query" required />
+                <textarea name="message" className="input-field min-h-32 md:col-span-2" placeholder="Write your query here" required />
+              </div>
+              <button type="submit" className="btn btn-primary mt-5">
+                Send Query
+              </button>
+            </form>
+          ) : null}
         </section>
       </main>
 
