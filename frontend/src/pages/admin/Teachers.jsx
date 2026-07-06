@@ -84,6 +84,90 @@ function DetailItem({ label, value }) {
   );
 }
 
+const formatValue = (value) => {
+  if (Array.isArray(value)) return value.filter(Boolean).join(", ") || "-";
+  return value === undefined || value === null || value === "" ? "-" : value;
+};
+
+const escapeHtml = (value) =>
+  String(formatValue(value))
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const downloadTextFile = (filename, lines) => {
+  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+const printDetails = (title, rows) => {
+  const printWindow = window.open("", "_blank", "width=900,height=700");
+  if (!printWindow) return;
+  const rowHtml = rows
+    .map(([label, value]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`)
+    .join("");
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 32px; color: #0f172a; }
+          h1 { margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; vertical-align: top; }
+          th { width: 220px; background: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        <h1>${title}</h1>
+        <table>${rowHtml}</table>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+};
+
+const getTeacherDetailRows = (teacher) => [
+  ["Name", teacher?.user?.name],
+  ["Email", teacher?.user?.email],
+  ["Primary Subject", teacher?.subject],
+  ["Qualification", teacher?.qualification],
+  ["Specialization", teacher?.specialization],
+  ["Certifications", teacher?.certifications],
+  ["Designation", teacher?.designation],
+  ["Experience", teacher?.experienceYears],
+  ["Phone", teacher?.phone],
+  ["Alternate Phone", teacher?.alternatePhone],
+  ["DOB", teacher?.dob ? String(teacher.dob).slice(0, 10) : ""],
+  ["Gender", teacher?.gender],
+  ["City", teacher?.city],
+  ["State", teacher?.state],
+  ["Pincode", teacher?.pincode],
+  ["Address", teacher?.address],
+  ["Devices", teacher?.devices],
+  ["Online Experience", teacher?.onlineExperience],
+  ["Online Details", teacher?.onlineExperienceDetails],
+  ["Demo Ready", teacher?.demoReady],
+  ["Demo Topic", teacher?.demoTopic],
+  ["Institutions", teacher?.institutions],
+  ["Why Join", teacher?.whyBst],
+  ["Comments", teacher?.comments],
+  ["Declaration Accepted", teacher?.declarationAccepted ? "Yes" : "No"],
+  ["Signature", teacher?.signature],
+  ["Declaration Date", teacher?.declarationDate ? String(teacher.declarationDate).slice(0, 10) : ""],
+];
+
 const appendFormFields = (form) => {
   const formData = new FormData();
   Object.entries(form).forEach(([key, value]) => {
@@ -272,6 +356,15 @@ export default function Teachers() {
       .toLowerCase();
     return values.includes(q);
   });
+
+  const handlePrintTeacher = (teacher) => {
+    printDetails(`Faculty Details - ${teacher?.user?.name || "Profile"}`, getTeacherDetailRows(teacher));
+  };
+
+  const handleDownloadTeacher = (teacher) => {
+    const lines = getTeacherDetailRows(teacher).map(([label, value]) => `${label}: ${formatValue(value)}`);
+    downloadTextFile(`${teacher?.user?.name || "faculty"}-details.txt`, lines);
+  };
 
   return (
     <Layout>
@@ -551,7 +644,11 @@ export default function Teachers() {
                 Search karne ke baad ya table se select karne par full information yahan dikhegi.
               </p>
             </div>
-            <Button variant="outline" onClick={() => setSelectedTeacher(null)}>Close Details</Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => handlePrintTeacher(selectedTeacher)}>Print Preview</Button>
+              <Button variant="outline" onClick={() => handleDownloadTeacher(selectedTeacher)}>Download Details</Button>
+              <Button variant="outline" onClick={() => setSelectedTeacher(null)}>Close Details</Button>
+            </div>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">

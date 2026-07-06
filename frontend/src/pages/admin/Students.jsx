@@ -41,6 +41,86 @@ function DetailItem({ label, value }) {
   );
 }
 
+const formatValue = (value) => {
+  if (Array.isArray(value)) return value.filter(Boolean).join(", ") || "-";
+  return value === undefined || value === null || value === "" ? "-" : value;
+};
+
+const escapeHtml = (value) =>
+  String(formatValue(value))
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const downloadTextFile = (filename, lines) => {
+  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+const printDetails = (title, rows) => {
+  const printWindow = window.open("", "_blank", "width=900,height=700");
+  if (!printWindow) return;
+  const rowHtml = rows
+    .map(([label, value]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`)
+    .join("");
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 32px; color: #0f172a; }
+          h1 { margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; vertical-align: top; }
+          th { width: 220px; background: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        <h1>${title}</h1>
+        <table>${rowHtml}</table>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+};
+
+const getStudentDetailRows = (student) => [
+  ["Name", student?.user?.name],
+  ["Email", student?.user?.email],
+  ["Class", student?.classId?.name],
+  ["Roll No", student?.rollNo],
+  ["Admission No", student?.admissionNo],
+  ["Section / Year", student?.section],
+  ["Phone", student?.phone],
+  ["Guardian Name", student?.guardianName],
+  ["Guardian Phone", student?.guardianPhone],
+  ["DOB", student?.dob ? String(student.dob).slice(0, 10) : ""],
+  ["Gender", student?.gender],
+  ["City", student?.city],
+  ["State", student?.state],
+  ["Pincode", student?.pincode],
+  ["Transport", student?.transportMode],
+  ["Address", student?.address],
+  ["Previous School", student?.previousSchool],
+  ["Medical Notes", student?.medicalNotes],
+  ["Admin Notes", student?.notes],
+  ["Fee Status", student?.fee?.status],
+  ["Total Fee", student?.fee?.totalFee],
+  ["Paid Amount", student?.fee?.paidAmount],
+  ["Due Amount", student?.fee?.dueAmount],
+];
+
 const appendFormFields = (form) => {
   const formData = new FormData();
   Object.entries(form).forEach(([key, value]) => {
@@ -206,6 +286,7 @@ export default function Students() {
       student?.admissionNo,
       student?.section,
       student?.classId?.name,
+      student?.fee?.status,
     ]
       .filter(Boolean)
       .join(" ")
@@ -213,6 +294,15 @@ export default function Students() {
 
     return values.includes(q);
   });
+
+  const handlePrintStudent = (student) => {
+    printDetails(`Student Details - ${student?.user?.name || "Profile"}`, getStudentDetailRows(student));
+  };
+
+  const handleDownloadStudent = (student) => {
+    const lines = getStudentDetailRows(student).map(([label, value]) => `${label}: ${formatValue(value)}`);
+    downloadTextFile(`${student?.user?.name || "student"}-details.txt`, lines);
+  };
 
   return (
     <Layout>
@@ -412,7 +502,11 @@ export default function Students() {
                 Full profile visible here after search or selection.
               </p>
             </div>
-            <Button variant="outline" onClick={() => setSelectedStudent(null)}>Close Details</Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => handlePrintStudent(selectedStudent)}>Print Preview</Button>
+              <Button variant="outline" onClick={() => handleDownloadStudent(selectedStudent)}>Download Details</Button>
+              <Button variant="outline" onClick={() => setSelectedStudent(null)}>Close Details</Button>
+            </div>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -455,6 +549,7 @@ export default function Students() {
             { key: "class", title: "Class", render: (student) => student?.classId?.name || "-" },
             { key: "rollNo", title: "Roll No", render: (student) => student?.rollNo || "-" },
             { key: "guardian", title: "Guardian", render: (student) => student?.guardianName || "-" },
+            { key: "fee", title: "Fee Status", render: (student) => student?.fee?.status || "Due" },
             {
               key: "actions",
               title: "Actions",

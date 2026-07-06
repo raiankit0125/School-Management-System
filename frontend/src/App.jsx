@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import ChangePassword from "./pages/ChangePassword";
+import PublicInfoPage from "./pages/public/PublicInfoPage";
 import BulkUpload from "./pages/admin/BulkUpload";
 import BulkMarksUpload from "./pages/teacher/BulkMarksUpload";
 import BulkAttendanceUpload from "./pages/teacher/BulkAttendanceUpload";
@@ -18,6 +19,7 @@ import Teachers from "./pages/admin/Teachers";
 import Students from "./pages/admin/Students";
 import Classes from "./pages/admin/Classes";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import FeeManagement from "./pages/admin/FeeManagement";
 
 // Teacher
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
@@ -32,6 +34,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import MyAttendance from "./pages/student/MyAttendance";
 import MyMarks from "./pages/student/MyMarks";
 import StudentNotices from "./pages/student/Notices";
+import MyFees from "./pages/student/MyFees";
 
 function HomeRedirect() {
   const { user } = useAuth();
@@ -49,6 +52,9 @@ export default function App() {
         <Route path="/" element={<HomeRedirect />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/about" element={<PublicInfoPage type="about" />} />
+        <Route path="/contact" element={<PublicInfoPage type="contact" />} />
+        <Route path="/privacy" element={<PublicInfoPage type="privacy" />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route
           path="/admin/bulk-upload"
@@ -86,6 +92,7 @@ export default function App() {
         <Route path="/admin" element={<ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/teachers" element={<ProtectedRoute role="ADMIN"><Teachers /></ProtectedRoute>} />
         <Route path="/admin/students" element={<ProtectedRoute role="ADMIN"><Students /></ProtectedRoute>} />
+        <Route path="/admin/fees" element={<ProtectedRoute role="ADMIN"><FeeManagement /></ProtectedRoute>} />
         <Route path="/admin/classes" element={<ProtectedRoute role="ADMIN"><Classes /></ProtectedRoute>} />
         <Route path="/admin/notifications" element={<ProtectedRoute role="ADMIN"><AdminNotifications /></ProtectedRoute>} />
         <Route path="/admin/calendar" element={<ProtectedRoute role="ADMIN"><CalendarPage /></ProtectedRoute>} />
@@ -105,6 +112,7 @@ export default function App() {
         <Route path="/student" element={<ProtectedRoute role="STUDENT"><StudentDashboard /></ProtectedRoute>} />
         <Route path="/student/attendance" element={<ProtectedRoute role="STUDENT"><MyAttendance /></ProtectedRoute>} />
         <Route path="/student/marks" element={<ProtectedRoute role="STUDENT"><MyMarks /></ProtectedRoute>} />
+        <Route path="/student/fees" element={<ProtectedRoute role="STUDENT"><MyFees /></ProtectedRoute>} />
         <Route path="/student/notices" element={<ProtectedRoute role="STUDENT"><StudentNotices /></ProtectedRoute>} />
         <Route path="/student/calendar" element={<ProtectedRoute role="STUDENT"><CalendarPage /></ProtectedRoute>} />
         <Route path="/student/chat" element={<ProtectedRoute role="STUDENT"><ChatCenter /></ProtectedRoute>} />

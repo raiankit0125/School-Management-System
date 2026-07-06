@@ -12,6 +12,7 @@ export default function StudentDashboard() {
   const [attendance, setAttendance] = useState([]);
   const [attendanceSummary, setAttendanceSummary] = useState(null);
   const [notices, setNotices] = useState([]);
+  const [fee, setFee] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function StudentDashboard() {
     axiosInstance.get("/student/attendance").then((res) => setAttendance(res.data.data));
     axiosInstance.get("/student/attendance-summary").then((res) => setAttendanceSummary(res.data.data));
     axiosInstance.get("/student/notices").then((res) => setNotices(res.data.data));
+    axiosInstance.get("/fees/me").then((res) => setFee(res.data.data));
   }, []);
 
   const presentCount = attendance.filter((item) => item.status === "PRESENT").length;
@@ -44,6 +46,7 @@ export default function StudentDashboard() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Button onClick={() => navigate("/student/attendance")}>View Attendance</Button>
               <Button variant="outline" onClick={() => navigate("/student/marks")}>View Marks</Button>
+              <Button variant="outline" onClick={() => navigate("/student/fees")}>View Fees</Button>
               <Button variant="outline" onClick={() => navigate("/student/notices")}>Open Notices</Button>
             </div>
           </div>
@@ -85,6 +88,13 @@ export default function StudentDashboard() {
         <div className="metric-card">
           <p className="text-sm text-slate-500">Notices</p>
           <p className="mt-2 text-xl font-semibold text-slate-900">{notices.length}</p>
+        </div>
+        <div className="metric-card">
+          <p className="text-sm text-slate-500">Fee Status</p>
+          <p className="mt-2 text-xl font-semibold text-slate-900">{fee?.status || "Due"}</p>
+          <p className="mt-1 text-sm font-semibold text-rose-600">
+            Rs. {Number(fee?.dueAmount || 0).toFixed(2)} due
+          </p>
         </div>
       </section>
 

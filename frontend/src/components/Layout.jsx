@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import Button from "./Button";
 import NotificationBell from "./NotificationBell";
 import ThemeToggle from "./ThemeToggle";
+import SiteFooter from "./SiteFooter";
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -55,6 +56,7 @@ export default function Layout({ children }) {
           { name: "Dashboard", to: "/admin" },
           { name: "Faculty", to: "/admin/teachers" },
           { name: "Students", to: "/admin/students" },
+          { name: "Fees", to: "/admin/fees" },
           { name: "Bulk Upload", to: "/admin/bulk-upload" },
           { name: "Classes", to: "/admin/classes" },
           { name: "Notifications", to: "/admin/notifications" },
@@ -78,6 +80,7 @@ export default function Layout({ children }) {
           { name: "Dashboard", to: "/student" },
           { name: "My Attendance", to: "/student/attendance" },
           { name: "My Marks", to: "/student/marks" },
+          { name: "My Fees", to: "/student/fees" },
           { name: "My Notices", to: "/student/notices" },
           { name: "Calendar", to: "/student/calendar" },
           { name: "Messages", to: "/student/chat" },
@@ -197,12 +200,7 @@ export default function Layout({ children }) {
           <div className="content-stage">
             <div className="min-w-0 max-w-full">{children}</div>
           </div>
-          <footer className="mt-10 rounded-[30px] border border-white/60 bg-white/80 px-6 py-6 text-sm text-slate-700 shadow-[0_20px_50px_-38px_rgba(15,23,42,0.3)] backdrop-blur">
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <p>Academic Hub supports faculty operations, student progress, attendance, notices, and communication.</p>
-              <p>Designed for school and college workflows.</p>
-            </div>
-          </footer>
+          <SiteFooter />
         </main>
       </div>
     </div>

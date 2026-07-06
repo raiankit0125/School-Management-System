@@ -4,11 +4,12 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import SiteFooter from "../components/SiteFooter";
 import { isEmail } from "../utils/formValidation";
 
 export default function Login() {
-    const [email, setEmail] = useState("admin@gmail.com");
-    const [password, setPassword] = useState("admin123");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
     const { login } = useAuth();
@@ -58,29 +59,58 @@ export default function Login() {
     };
 
     return (
-        <div className="app-shell flex items-center justify-center px-4 py-10">
-            <div className="grid w-full max-w-5xl grid-cols-1 overflow-hidden rounded-3xl border border-slate-200/70 bg-white/80 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.6)] lg:grid-cols-2">
-                <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 p-10 text-white">
+        <div className="app-shell login-shell flex min-h-screen flex-col px-4 py-8">
+          <main className="flex flex-1 items-center justify-center">
+            <div className="login-card grid w-full max-w-6xl grid-cols-1 overflow-hidden rounded-3xl border border-slate-200/70 bg-white/90 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.6)] lg:grid-cols-[1.05fr_0.95fr]">
+                <div className="login-brand-panel hidden flex-col justify-between p-10 text-white lg:flex">
                     <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-white/60">Welcome</p>
-                        <h1 className="mt-4 text-3xl font-semibold">Smart School Suite</h1>
-                        <p className="mt-3 text-sm text-white/70">
-                            Track attendance, manage classes, and keep everything in one place.
+                        <div className="brand-logo" aria-hidden="true">
+                            <span className="brand-logo-mark">SMS</span>
+                            <span className="brand-logo-ring" />
+                        </div>
+                        <p className="mt-7 text-xs uppercase tracking-[0.3em] text-white/65">Welcome</p>
+                        <h1 className="mt-4 max-w-md text-5xl font-semibold leading-[1.04]">Smart Management System</h1>
+                        <p className="mt-4 max-w-md text-sm leading-6 text-white/75">
+                            A cleaner command center for attendance, classes, fees, messages, and student progress.
                         </p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80">
-                        Demo credentials: <span className="font-semibold">admin@gmail.com / admin123</span>
+
+                    <div className="smart-image-stage" aria-hidden="true">
+                        <div className="smart-image-track">
+                            <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=760&q=80" alt="" />
+                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=760&q=80" alt="" />
+                            <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=760&q=80" alt="" />
+                            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=760&q=80" alt="" />
+                        </div>
+                        <div className="smart-stat-card smart-stat-card-one">
+                            <span>Live</span>
+                            <strong>Role based access</strong>
+                        </div>
+                        <div className="smart-stat-card smart-stat-card-two">
+                            <span>Unified</span>
+                            <strong>Fees & academics</strong>
+                        </div>
                     </div>
                 </div>
 
-                <div className="p-8 sm:p-10">
+                <div className="login-form-panel p-8 sm:p-10">
+                    <div className="mb-7 flex items-center gap-3 lg:hidden">
+                        <div className="brand-logo brand-logo-small" aria-hidden="true">
+                            <span className="brand-logo-mark">SMS</span>
+                            <span className="brand-logo-ring" />
+                        </div>
+                        <div>
+                            <p className="label text-teal-600/80">Portal</p>
+                            <h1 className="text-xl font-semibold text-slate-900">Smart Management System</h1>
+                        </div>
+                    </div>
                     <div>
                         <p className="label text-teal-600/80">Sign in</p>
-                        <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+                        <h2 className="mt-2 text-4xl font-semibold leading-tight text-slate-900">
                             Welcome back
                         </h2>
-                        <p className="mt-2 text-sm text-slate-500">
-                            Use your admin, teacher, or student credentials to continue.
+                        <p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">
+                            Continue to your workspace with a secure admin, faculty, or student account.
                         </p>
                     </div>
 
@@ -107,11 +137,7 @@ export default function Login() {
                         </Button>
                     </form>
 
-                    <div className="mt-4 text-xs text-slate-500 lg:hidden">
-                        Demo: <span className="font-semibold">admin@gmail.com / admin123</span>
-                    </div>
-
-                    <p className="text-sm text-slate-500 mt-5">
+                    <p className="mt-5 text-sm text-slate-500">
                         New admin?{" "}
                         <Link to="/register" className="font-semibold text-teal-600 hover:text-teal-700">
                             Register
@@ -119,6 +145,10 @@ export default function Login() {
                     </p>
                 </div>
             </div>
+          </main>
+          <div className="mx-auto w-full max-w-6xl">
+            <SiteFooter compact />
+          </div>
         </div>
     );
 }
