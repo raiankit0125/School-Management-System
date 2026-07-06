@@ -111,6 +111,120 @@ export const todayAttendanceStatus = async (req, res) => {
   );
 };
 
+const buildAttendanceSummary = async ({ classId, teacherId }) => {
+  const cls = await ClassModel.findOne({ _id: classId, teacher: teacherId });
+  if (!cls) return null;
+
+  const [students, records] = await Promise.all([
+    Student.find({ classId }).populate("user", "name email profileImage").sort({ rollNo: 1 }),
+    Attendance.find({ classId }),
+  ]);
+
+  const totalMarkedDays = new Set(records.map((item) => item.date)).size;
+  const countsByStudent = records.reduce((acc, item) => {
+    const key = String(item.studentId);
+    if (!acc[key]) acc[key] = { present: 0, absent: 0, total: 0 };
+    acc[key].total += 1;
+    if (item.status === "PRESENT") acc[key].present += 1;
+    if (item.status === "ABSENT") acc[key].absent += 1;
+    return acc;
+  }, {});
+
+  return {
+    classId,
+    className: cls.name,
+    totalMarkedDays,
+    students: students.map((student) => {
+      const stats = countsByStudent[String(student._id)] || { present: 0, absent: 0, total: 0 };
+      const percentage = totalMarkedDays > 0 ? Math.round((stats.present / totalMarkedDays) * 100) : 0;
+      return {
+        studentId: student._id,
+        userId: student.user?._id,
+        name: student.user?.name,
+        email: student.user?.email,
+        profileImage: student.user?.profileImage,
+        rollNo: student.rollNo,
+        present: stats.present,
+        absent: Math.max(totalMarkedDays - stats.present, stats.absent),
+        totalMarkedDays,
+        percentage,
+      };
+    }),
+  };
+};
+
+export const getClassAttendanceSummary = async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ user: req.user._id });
+    if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
+    const summary = await buildAttendanceSummary({
+      classId: req.params.classId,
+      teacherId: teacher._id,
+    });
+    if (!summary) return res.status(403).json({ message: "You are not assigned to this class" });
+
+    const threshold = Number(req.query.threshold || 75);
+    return res.json(
+      new ApiResponse(
+        200,
+        {
+          ...summary,
+          threshold,
+          lowAttendance: summary.students.filter((student) => student.percentage < threshold),
+        },
+        "Attendance percentage summary"
+      )
+    );
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+export const notifyLowAttendance = async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ user: req.user._id });
+    if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
+    const threshold = Number(req.body.threshold || 75);
+    if (!Number.isFinite(threshold) || threshold < 1 || threshold > 100) {
+      return res.status(400).json({ message: "Threshold must be between 1 and 100" });
+    }
+
+    const summary = await buildAttendanceSummary({
+      classId: req.params.classId,
+      teacherId: teacher._id,
+    });
+    if (!summary) return res.status(403).json({ message: "You are not assigned to this class" });
+
+    const lowAttendance = summary.students.filter((student) => student.percentage < threshold && student.userId);
+    if (lowAttendance.length === 0) {
+      return res.json(new ApiResponse(200, { sentCount: 0, threshold }, "No students below threshold"));
+    }
+
+    const notifications = await SystemNotification.insertMany(
+      lowAttendance.map((student) => ({
+        recipient: student.userId,
+        sender: req.user._id,
+        title: "Attendance below required percentage",
+        message: `Your attendance in ${summary.className} is ${student.percentage}%. Required attendance is ${threshold}%. Please improve your attendance.`,
+        type: "URGENT",
+        audience: `Class ${summary.className}`,
+      }))
+    );
+
+    return res.json(
+      new ApiResponse(
+        200,
+        { sentCount: notifications.length, threshold, lowAttendance },
+        "Low attendance alerts sent"
+      )
+    );
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 export const bulkUploadMarks = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "File required" });

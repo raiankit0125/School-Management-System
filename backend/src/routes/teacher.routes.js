@@ -10,7 +10,9 @@ import {
   myProfile,
   myClasses,
   getStudentsByClass,
+  getClassAttendanceSummary,
   markAttendance,
+  notifyLowAttendance,
   uploadMarks,
   sendStudentNotice,
   sendClassNotification,
@@ -26,6 +28,8 @@ router.get("/classes", myClasses);
 router.get("/class/:classId/students", getStudentsByClass);
 
 router.post("/attendance", markAttendance);
+router.get("/attendance-summary/:classId", getClassAttendanceSummary);
+router.post("/attendance-summary/:classId/notify", notifyLowAttendance);
 router.post("/marks", uploadMarks);
 router.get("/attendance-status", todayAttendanceStatus);
 router.post("/bulk/marks", upload.single("file"), bulkUploadMarks);

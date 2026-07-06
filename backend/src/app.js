@@ -9,6 +9,7 @@ import studentRoutes from "./routes/student.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import bulkRoutes from "./routes/bulk.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
+import feeRoutes from "./routes/fee.routes.js";
 
 const app = express();
 
@@ -64,5 +65,6 @@ app.use("/api/student", studentRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/bulk", bulkRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/fees", feeRoutes);
 
 export default app;

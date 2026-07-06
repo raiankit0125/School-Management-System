@@ -44,7 +44,7 @@ const getAllowedContactIds = async (user) => {
 
 export const getChatContacts = async (req, res) => {
   const allowedIds = await getAllowedContactIds(req.user);
-  const contacts = await User.find({ _id: { $in: allowedIds } }).select("_id name email role");
+  const contacts = await User.find({ _id: { $in: allowedIds } }).select("_id name email role profileImage");
   return res.json(new ApiResponse(200, contacts, "Chat contacts"));
 };
 
@@ -63,8 +63,8 @@ export const getChatThread = async (req, res) => {
     ],
   })
     .sort({ createdAt: 1 })
-    .populate("sender", "name role email")
-    .populate("recipient", "name role email");
+    .populate("sender", "name role email profileImage")
+    .populate("recipient", "name role email profileImage");
 
   return res.json(new ApiResponse(200, messages, "Chat thread"));
 };
@@ -102,8 +102,8 @@ export const sendChatMessage = async (req, res) => {
   });
 
   const populated = await ChatMessage.findById(message._id)
-    .populate("sender", "name role email")
-    .populate("recipient", "name role email");
+    .populate("sender", "name role email profileImage")
+    .populate("recipient", "name role email profileImage");
 
   await SystemNotification.create({
     recipient: recipientId,

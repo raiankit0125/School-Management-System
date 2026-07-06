@@ -5,6 +5,7 @@ import { ClassModel } from "../models/Class.model.js";
 import { Attendance } from "../models/Attendance.model.js";
 import { Mark } from "../models/Mark.model.js";
 import { SystemNotification } from "../models/SystemNotification.model.js";
+import { Fee } from "../models/Fee.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { generatePassword } from "../utils/generatePassword.js";
 import { queueMail, sendMail } from "../utils/sendMail.js";
@@ -38,6 +39,21 @@ const normalizeList = (value) => {
   return [];
 };
 
+const parseBoolean = (value) => {
+  if (typeof value === "boolean") return value;
+  return ["true", "yes", "1", "on"].includes(String(value || "").trim().toLowerCase());
+};
+
+const getProfileImageDataUrl = (file) => {
+  if (!file) return "";
+  if (!file.mimetype?.startsWith("image/")) {
+    const error = new Error("Profile picture must be an image file");
+    error.statusCode = 400;
+    throw error;
+  }
+  return `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+};
+
 const buildFacultyPayload = (body = {}) => ({
   subject: body.subject || "",
   phone: body.phone || "",
@@ -69,7 +85,7 @@ const buildFacultyPayload = (body = {}) => ({
   demoTopic: body.demoTopic || "",
   whyBst: body.whyBst || "",
   comments: body.comments || "",
-  declarationAccepted: Boolean(body.declarationAccepted),
+  declarationAccepted: parseBoolean(body.declarationAccepted),
   signature: body.signature || "",
   declarationDate: body.declarationDate || null,
 });
@@ -156,13 +172,18 @@ const getMailFailureMessage = (error) => {
   return error?.message || "Unable to send reset email";
 };
 
-const buildCredentialPayload = ({ email, tempPassword, emailSent = null, mailQueued = null, mailError = "" }) => ({
+const buildCredentialPayload = ({ email, emailSent = null, mailQueued = null, mailError = "" }) => ({
   email,
-  tempPassword,
   emailSent,
   mailQueued,
   mailError,
 });
+
+const sanitizeUser = (user) => {
+  const safeUser = user?.toObject ? user.toObject() : { ...user };
+  delete safeUser.password;
+  return safeUser;
+};
 
 export const getDashboard = async (req, res) => {
   const totalTeachers = await User.countDocuments({ role: "TEACHER" });
@@ -184,6 +205,7 @@ export const createTeacher = async (req, res) => {
     if (!isValidEmail(normalizedEmail)) {
       return res.status(400).json({ message: "Enter a valid email address" });
     }
+    const profileImage = getProfileImageDataUrl(req.file);
     const validationMessage = validateFacultyPayload(req.body);
     if (validationMessage) return res.status(400).json({ message: validationMessage });
 
@@ -198,6 +220,7 @@ export const createTeacher = async (req, res) => {
       name,
       email: normalizedEmail,
       password: tempPassword,
+      profileImage,
       role: "TEACHER",
       mustChangePassword: true,
     });
@@ -223,11 +246,10 @@ export const createTeacher = async (req, res) => {
         new ApiResponse(
           201,
           {
-            user,
+            user: sanitizeUser(user),
             teacher,
             credentials: buildCredentialPayload({
               email: normalizedEmail,
-              tempPassword,
               mailQueued: true,
             }),
           },
@@ -239,7 +261,7 @@ export const createTeacher = async (req, res) => {
       await User.findByIdAndDelete(user._id).catch(() => {});
     }
     console.error("Create Teacher Error:", error);
-    return res.status(500).json({ message: error.message || "Server error" });
+    return res.status(error.statusCode || 500).json({ message: error.message || "Server error" });
   }
 };
 
@@ -260,6 +282,7 @@ export const updateTeacher = async (req, res) => {
     if (normalizedEmail && !isValidEmail(normalizedEmail)) {
       return res.status(400).json({ message: "Enter a valid email address" });
     }
+    const profileImage = getProfileImageDataUrl(req.file);
     const validationMessage = validateFacultyPayload(req.body);
     if (validationMessage) return res.status(400).json({ message: validationMessage });
 
@@ -270,6 +293,8 @@ export const updateTeacher = async (req, res) => {
 
     if (name) teacher.user.name = name;
     if (normalizedEmail) teacher.user.email = normalizedEmail;
+    if (profileImage) teacher.user.profileImage = profileImage;
+    if (parseBoolean(req.body.removeProfileImage)) teacher.user.profileImage = "";
     await teacher.user.save();
 
     Object.assign(teacher, buildFacultyPayload(req.body));
@@ -278,7 +303,7 @@ export const updateTeacher = async (req, res) => {
 
     return res.json(new ApiResponse(200, teacher, "Teacher updated"));
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res.status(err.statusCode || 500).json({ message: err.message });
   }
 };
 
@@ -294,6 +319,7 @@ export const createStudent = async (req, res) => {
     if (!isValidEmail(normalizedEmail)) {
       return res.status(400).json({ message: "Enter a valid email address" });
     }
+    const profileImage = getProfileImageDataUrl(req.file);
     const validationMessage = validateStudentPayload(req.body);
     if (validationMessage) return res.status(400).json({ message: validationMessage });
 
@@ -306,6 +332,7 @@ export const createStudent = async (req, res) => {
       name,
       email: normalizedEmail,
       password: tempPassword,
+      profileImage,
       role: "STUDENT",
       mustChangePassword: true,
     });
@@ -329,11 +356,10 @@ export const createStudent = async (req, res) => {
       new ApiResponse(
         201,
         {
-          user,
+          user: sanitizeUser(user),
           student,
           credentials: buildCredentialPayload({
             email: normalizedEmail,
-            tempPassword,
             mailQueued: true,
           }),
         },
@@ -344,7 +370,7 @@ export const createStudent = async (req, res) => {
     if (user?._id) {
       await User.findByIdAndDelete(user._id).catch(() => {});
     }
-    return res.status(500).json({ message: error.message || "Server error" });
+    return res.status(error.statusCode || 500).json({ message: error.message || "Server error" });
   }
 };
 
@@ -379,7 +405,6 @@ export const resendCredentials = async (req, res) => {
           {
             credentials: buildCredentialPayload({
               email: user.email,
-              tempPassword,
               emailSent: true,
             }),
           },
@@ -393,7 +418,6 @@ export const resendCredentials = async (req, res) => {
           {
             credentials: buildCredentialPayload({
               email: user.email,
-              tempPassword,
               emailSent: false,
               mailError: getMailFailureMessage(error),
             }),
@@ -403,7 +427,7 @@ export const resendCredentials = async (req, res) => {
       );
     }
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res.status(err.statusCode || 500).json({ message: err.message });
   }
 };
 
@@ -412,7 +436,20 @@ export const getStudents = async (req, res) => {
   const students = await Student.find()
     .populate("user", "-password")
     .populate("classId");
-  return res.json(new ApiResponse(200, students, "Students list"));
+  const fees = await Fee.find({ student: { $in: students.map((student) => student._id) } });
+  const feeByStudentId = new Map(fees.map((fee) => [String(fee.student), fee]));
+  const studentsWithFee = students.map((student) => {
+    const data = student.toObject();
+    data.fee = feeByStudentId.get(String(student._id)) || {
+      totalFee: 0,
+      paidAmount: 0,
+      dueAmount: 0,
+      status: "Due",
+      paymentHistory: [],
+    };
+    return data;
+  });
+  return res.json(new ApiResponse(200, studentsWithFee, "Students list"));
 };
 
 export const updateStudent = async (req, res) => {
@@ -427,6 +464,7 @@ export const updateStudent = async (req, res) => {
     if (normalizedEmail && !isValidEmail(normalizedEmail)) {
       return res.status(400).json({ message: "Enter a valid email address" });
     }
+    const profileImage = getProfileImageDataUrl(req.file);
     const validationMessage = validateStudentPayload(req.body);
     if (validationMessage) return res.status(400).json({ message: validationMessage });
 
@@ -437,6 +475,8 @@ export const updateStudent = async (req, res) => {
 
     if (name) student.user.name = name;
     if (normalizedEmail) student.user.email = normalizedEmail;
+    if (profileImage) student.user.profileImage = profileImage;
+    if (parseBoolean(req.body.removeProfileImage)) student.user.profileImage = "";
     await student.user.save();
 
     Object.assign(student, buildStudentPayload(req.body));
@@ -542,6 +582,7 @@ export const deleteStudent = async (req, res) => {
 
     await Attendance.deleteMany({ studentId });
     await Mark.deleteMany({ studentId });
+    await Fee.deleteOne({ student: studentId });
 
     await Student.findByIdAndDelete(studentId);
     await User.findByIdAndDelete(student.user);

@@ -55,12 +55,61 @@ export const changePassword = async (req, res) => {
   }
 };
 
+const getProfileImageDataUrl = (file) => {
+  if (!file) return "";
+  if (!file.mimetype?.startsWith("image/")) {
+    const error = new Error("Profile picture must be an image file");
+    error.statusCode = 400;
+    throw error;
+  }
+  return `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+};
+
+const sanitizeUser = (user) => {
+  const safeUser = user?.toObject ? user.toObject() : { ...user };
+  delete safeUser.password;
+  return safeUser;
+};
+
+export const updateProfileImage = async (req, res) => {
+  try {
+    const profileImage = getProfileImageDataUrl(req.file);
+    if (!profileImage) return res.status(400).json({ message: "Profile picture is required" });
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { profileImage },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.json(new ApiResponse(200, sanitizeUser(user), "Profile picture updated"));
+  } catch (err) {
+    return res.status(err.statusCode || 500).json({ message: err.message });
+  }
+};
+
+export const deleteProfileImage = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { profileImage: "" },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.json(new ApiResponse(200, sanitizeUser(user), "Profile picture removed"));
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 const getOwnProfile = async (user) => {
   if (user.role === "TEACHER") {
-    return Teacher.findOne({ user: user._id }).populate("user", "name email role createdAt");
+    return Teacher.findOne({ user: user._id }).populate("user", "name email role profileImage createdAt");
   }
   if (user.role === "STUDENT") {
-    return Student.findOne({ user: user._id }).populate("user", "name email role createdAt");
+    return Student.findOne({ user: user._id }).populate("user", "name email role profileImage createdAt");
   }
   return null;
 };
