@@ -89,10 +89,21 @@ export default function Layout({ children }) {
         ];
 
   const activeLink = links.find((link) => link.to === location.pathname);
+  const roleHome = links[0]?.to || "/";
+  const canGoBack = location.pathname !== roleHome;
 
   const openMobileSection = (to) => {
     setMobileMenuOpen(false);
     navigate(to);
+  };
+
+  const goBack = () => {
+    setMobileMenuOpen(false);
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate(roleHome);
   };
 
   return (
@@ -172,7 +183,7 @@ export default function Layout({ children }) {
               <button
                 type="button"
                 className="app-menu-trigger lg:hidden"
-                aria-label="Open menu"
+                aria-label="Open full menu"
                 aria-expanded={mobileMenuOpen}
                 onClick={() => setMobileMenuOpen(true)}
               >
@@ -180,6 +191,16 @@ export default function Layout({ children }) {
                 <span />
                 <span />
               </button>
+              {canGoBack ? (
+                <button
+                  type="button"
+                  className="app-back-trigger lg:hidden"
+                  aria-label="Go back"
+                  onClick={goBack}
+                >
+                  <span aria-hidden="true">&lt;</span>
+                </button>
+              ) : null}
               <div className="brand-logo brand-logo-app" aria-hidden="true">
                 <span className="brand-logo-mark">SMS</span>
                 <span className="brand-logo-ring" />
@@ -251,6 +272,16 @@ export default function Layout({ children }) {
                       x
                     </button>
                   </div>
+                  {canGoBack ? (
+                    <button
+                      type="button"
+                      className="mobile-drawer-back"
+                      onClick={goBack}
+                    >
+                      <span aria-hidden="true">&lt;</span>
+                      Back
+                    </button>
+                  ) : null}
                   <div className="mt-5 grid grid-cols-2 gap-2">
                     <div className="rounded-2xl bg-white/12 px-3 py-3">
                       <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Role</p>
@@ -263,6 +294,10 @@ export default function Layout({ children }) {
                   </div>
                 </div>
 
+                <div className="mobile-drawer-section-title">
+                  <span>Menu</span>
+                  <strong>All options</strong>
+                </div>
                 <nav className="mobile-drawer-nav">
                   {links.map((link) => {
                     const isActive = link.to === location.pathname;
