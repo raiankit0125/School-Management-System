@@ -6,17 +6,26 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import SiteFooter from "../components/SiteFooter";
 import { isEmail } from "../utils/formValidation";
+import { API_ORIGIN, HAS_PLACEHOLDER_API_URL } from "../config/apiConfig";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError("");
+        if (HAS_PLACEHOLDER_API_URL) {
+            const message = "Mobile API URL is still a placeholder. Set frontend/.env.mobile to your real Render backend URL, then rebuild and reinstall the APK.";
+            setError(message);
+            alert(message);
+            return;
+        }
         if (!isEmail(email)) {
             alert("Enter a valid email address");
             return;
@@ -52,7 +61,13 @@ export default function Login() {
             if (role === "TEACHER") navigate("/teacher");
             if (role === "STUDENT") navigate("/student");
         } catch (err) {
-            alert(err?.response?.data?.message || "Login failed");
+            const message =
+                err?.response?.data?.message ||
+                (err?.request
+                    ? `Cannot reach backend at ${API_ORIGIN}. Check .env.mobile, Render service, and CORS.`
+                    : "Login failed");
+            setError(message);
+            alert(message);
         } finally {
             setLoading(false);
         }
@@ -115,6 +130,11 @@ export default function Login() {
                     </div>
 
                     <form className="mt-6 space-y-4" onSubmit={handleLogin}>
+                        {error ? (
+                            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700">
+                                {error}
+                            </div>
+                        ) : null}
                         <Input
                             label="Email"
                             type="email"
