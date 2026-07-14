@@ -107,8 +107,16 @@ export default function Layout({ children }) {
       {/* Sidebar */}
       <aside className="relative hidden w-80 flex-col gap-8 border-r border-white/20 bg-slate-950/40 p-5 shadow-[10px_0_45px_-34px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:flex">
         <div className={`rounded-[28px] bg-gradient-to-br ${roleAccent} p-6 text-white shadow-xl`}>
-          <p className="text-xs uppercase tracking-widest text-white/70">Portal</p>
-          <h2 className="mt-2 text-3xl font-semibold">Academic Hub</h2>
+          <div className="flex items-center gap-4">
+            <div className="brand-logo brand-logo-small" aria-hidden="true">
+              <span className="brand-logo-mark">SMS</span>
+              <span className="brand-logo-ring" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-widest text-white/70">Portal</p>
+              <h2 className="mt-1 text-2xl font-semibold">Academic Hub</h2>
+            </div>
+          </div>
           <p className="mt-2 text-sm text-white/80">Built for schools, colleges, and modern academic teams</p>
           <div className="mt-5 grid grid-cols-2 gap-3 text-xs text-white/90">
             <div className="rounded-2xl bg-white/10 px-3 py-3">
@@ -158,66 +166,31 @@ export default function Layout({ children }) {
       {/* Main */}
       <div className="relative flex min-w-0 flex-1 flex-col">
         {/* Navbar */}
-        <header className="sticky top-0 z-10 w-full border-b border-white/45 bg-white/70 px-3 py-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/70 sm:px-6 sm:py-4">
-          <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0">
-              <h1 className="truncate text-base font-semibold text-slate-900 sm:text-lg">{user?.role} Workspace</h1>
-              <p className="truncate text-sm text-slate-600">{user?.name}</p>
+        <header className="sticky top-0 z-20 w-full border-b border-white/45 bg-white/82 px-3 py-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/82 sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                className="app-menu-trigger lg:hidden"
+                aria-label="Open menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <span />
+                <span />
+                <span />
+              </button>
+              <div className="brand-logo brand-logo-app" aria-hidden="true">
+                <span className="brand-logo-mark">SMS</span>
+                <span className="brand-logo-ring" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="truncate text-base font-semibold text-slate-900 sm:text-lg">{user?.role} Workspace</h1>
+                <p className="truncate text-xs text-slate-500 sm:text-sm">{activeLink?.name || user?.name}</p>
+              </div>
             </div>
 
-            <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="relative lg:hidden">
-                <button
-                  type="button"
-                  className="mobile-menu-button"
-                  aria-expanded={mobileMenuOpen}
-                  aria-controls="mobile-section-menu"
-                  onClick={() => setMobileMenuOpen((open) => !open)}
-                >
-                  <span className="mobile-menu-icon" aria-hidden="true">
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                  <span className="min-w-0 flex-1 text-left">
-                    <span className="block text-[10px] font-semibold uppercase tracking-[0.24em] text-white/55">
-                      Section
-                    </span>
-                    <span className="block truncate text-base font-semibold text-white">
-                      {activeLink?.name || "Open section"}
-                    </span>
-                  </span>
-                  <span className={`mobile-menu-caret ${mobileMenuOpen ? "rotate-180" : ""}`} aria-hidden="true">
-                    ^
-                  </span>
-                </button>
-
-                {mobileMenuOpen ? (
-                  <div className="mobile-menu-popover" id="mobile-section-menu">
-                    <div className={`mobile-menu-head bg-gradient-to-br ${roleAccent}`}>
-                      <p>Navigate</p>
-                      <strong>{user?.role} Menu</strong>
-                    </div>
-                    <div className="mobile-menu-list">
-                      {links.map((link) => {
-                        const isActive = link.to === location.pathname;
-                        return (
-                          <button
-                            key={link.to}
-                            type="button"
-                            className={`mobile-menu-item ${isActive ? "mobile-menu-item-active" : ""}`}
-                            onClick={() => openMobileSection(link.to)}
-                          >
-                            <span>{link.name}</span>
-                            <span className="mobile-menu-dot" aria-hidden="true" />
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <div className="hidden items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/75 px-3 py-2 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.4)] md:flex">
                 <img src={roleVisual.image} alt={roleVisual.label} className="h-11 w-11 rounded-2xl object-cover" />
                 <div>
@@ -226,7 +199,7 @@ export default function Layout({ children }) {
                 </div>
               </div>
 
-              <div className="flex min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-3">
+              <div className="hidden min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-3 lg:flex">
                 <ThemeToggle />
                 <NotificationBell role={user?.role} />
                 <Button
@@ -240,8 +213,89 @@ export default function Layout({ children }) {
                   Logout
                 </Button>
               </div>
+
+              <div className="lg:hidden">
+                <NotificationBell role={user?.role} />
+              </div>
             </div>
           </div>
+
+          {mobileMenuOpen ? (
+            <div className="mobile-drawer-layer lg:hidden">
+              <button
+                type="button"
+                className="mobile-drawer-backdrop"
+                aria-label="Close menu"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <aside className="mobile-drawer">
+                <div className={`mobile-drawer-hero bg-gradient-to-br ${roleAccent}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="brand-logo brand-logo-small" aria-hidden="true">
+                        <span className="brand-logo-mark">SMS</span>
+                        <span className="brand-logo-ring" />
+                      </div>
+                      <div className="min-w-0 text-white">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/65">Workspace</p>
+                        <h2 className="truncate text-lg font-semibold">Academic Hub</h2>
+                        <p className="truncate text-xs text-white/75">{user?.name}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="mobile-drawer-close"
+                      aria-label="Close menu"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      x
+                    </button>
+                  </div>
+                  <div className="mt-5 grid grid-cols-2 gap-2">
+                    <div className="rounded-2xl bg-white/12 px-3 py-3">
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Role</p>
+                      <p className="mt-1 text-sm font-semibold text-white">{user?.role}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white/12 px-3 py-3">
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Section</p>
+                      <p className="mt-1 truncate text-sm font-semibold text-white">{activeLink?.name || "Dashboard"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <nav className="mobile-drawer-nav">
+                  {links.map((link) => {
+                    const isActive = link.to === location.pathname;
+                    return (
+                      <button
+                        key={link.to}
+                        type="button"
+                        className={`mobile-drawer-link ${isActive ? "mobile-drawer-link-active" : ""}`}
+                        onClick={() => openMobileSection(link.to)}
+                      >
+                        <span>{link.name}</span>
+                        <span className="mobile-drawer-link-mark" aria-hidden="true" />
+                      </button>
+                    );
+                  })}
+                </nav>
+
+                <div className="mobile-drawer-actions">
+                  <ThemeToggle />
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      logout();
+                      navigate("/login");
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              </aside>
+            </div>
+          ) : null}
+
         </header>
 
         <main className="w-full min-w-0 overflow-x-hidden p-3 sm:p-5 lg:p-8">

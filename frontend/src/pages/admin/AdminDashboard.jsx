@@ -40,12 +40,12 @@ export default function AdminDashboard() {
         subtitle="Professional academic operations view for schools, colleges, and training institutes."
       />
 
-      <section className="hero-panel bg-[linear-gradient(135deg,#123761_0%,#0f766e_55%,#d69d2c_100%)] px-6 py-8 text-white lg:px-8">
+      <section className="hero-panel bg-[linear-gradient(135deg,#123761_0%,#0f766e_55%,#d69d2c_100%)] px-5 py-6 text-white sm:px-6 sm:py-8 lg:px-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.15),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.12),transparent_24%)]" />
-        <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-white/70">Academic Command Center</p>
-            <h2 className="mt-3 max-w-2xl text-4xl font-semibold leading-tight">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/70 sm:text-xs sm:tracking-[0.35em]">Academic Command Center</p>
+            <h2 className="mt-3 max-w-2xl text-2xl font-semibold leading-tight sm:text-4xl">
               Control admissions, faculty enablement, progress tracking, and communication from one dashboard.
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/80">
@@ -53,18 +53,18 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div className="float-card rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur">
-              <p className="text-xs uppercase tracking-wider text-white/70">Faculty</p>
-              <p className="mt-3 text-4xl font-semibold">{stats?.totalTeachers ?? 0}</p>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="dashboard-stat-card">
+              <p>Faculty</p>
+              <strong>{stats?.totalTeachers ?? 0}</strong>
             </div>
-            <div className="float-card rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur [animation-delay:0.6s]">
-              <p className="text-xs uppercase tracking-wider text-white/70">Students</p>
-              <p className="mt-3 text-4xl font-semibold">{stats?.totalStudents ?? 0}</p>
+            <div className="dashboard-stat-card">
+              <p>Students</p>
+              <strong>{stats?.totalStudents ?? 0}</strong>
             </div>
-            <div className="float-card rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur [animation-delay:1.2s]">
-              <p className="text-xs uppercase tracking-wider text-white/70">Groups</p>
-              <p className="mt-3 text-4xl font-semibold">{stats?.totalClasses ?? 0}</p>
+            <div className="dashboard-stat-card">
+              <p>Groups</p>
+              <strong>{stats?.totalClasses ?? 0}</strong>
             </div>
           </div>
         </div>

@@ -148,6 +148,14 @@
     height: 56px;
     width: 56px;
     border-radius: 20px;
+    flex: 0 0 auto;
+  }
+
+  .brand-logo-app {
+    height: 42px;
+    width: 42px;
+    border-radius: 16px;
+    flex: 0 0 auto;
   }
 
   .brand-logo-mark {
@@ -163,6 +171,10 @@
     font-size: 0.78rem;
   }
 
+  .brand-logo-app .brand-logo-mark {
+    font-size: 0.64rem;
+  }
+
   .brand-logo-ring {
     position: absolute;
     inset: 12px;
@@ -175,6 +187,11 @@
   .brand-logo-small .brand-logo-ring {
     inset: 8px;
     border-radius: 16px;
+  }
+
+  .brand-logo-app .brand-logo-ring {
+    inset: 7px;
+    border-radius: 12px;
   }
 
   .login-demo-box {
@@ -334,6 +351,18 @@
     @apply relative w-full min-w-0 max-w-full overflow-hidden rounded-[34px] border border-white/40 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.55)];
   }
 
+  .dashboard-stat-card {
+    @apply min-w-0 rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur sm:p-5;
+  }
+
+  .dashboard-stat-card p {
+    @apply truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-white/70 sm:text-xs sm:tracking-wider;
+  }
+
+  .dashboard-stat-card strong {
+    @apply mt-2 block text-2xl font-semibold leading-none text-white sm:mt-3 sm:text-4xl;
+  }
+
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition duration-200;
   }
@@ -386,6 +415,70 @@
 
   .sidebar-link-idle {
     @apply text-white/80 hover:bg-white/10;
+  }
+
+  .app-menu-trigger {
+    @apply flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-1.5 rounded-2xl border border-slate-200/80 bg-white/85 text-slate-900 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.55)] outline-none transition hover:bg-white focus:ring-4 focus:ring-cyan-300/25;
+  }
+
+  .app-menu-trigger span {
+    display: block;
+    height: 2px;
+    width: 18px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .mobile-drawer-layer {
+    @apply fixed inset-0 z-50;
+  }
+
+  .mobile-drawer-backdrop {
+    @apply absolute inset-0 h-full w-full bg-slate-950/40 backdrop-blur-[2px];
+  }
+
+  .mobile-drawer {
+    @apply absolute bottom-0 left-0 top-0 flex w-[min(86vw,360px)] flex-col overflow-hidden border-r border-white/25 bg-white shadow-[28px_0_70px_-42px_rgba(2,6,23,0.82)] dark:border-slate-800 dark:bg-slate-950;
+    padding-top: env(safe-area-inset-top);
+    animation: drawer-in 220ms ease-out both;
+  }
+
+  .mobile-drawer-hero {
+    @apply p-4 shadow-[0_18px_44px_-30px_rgba(2,6,23,0.65)];
+  }
+
+  .mobile-drawer-close {
+    @apply grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-base font-semibold leading-none text-white transition hover:bg-white/20;
+  }
+
+  .mobile-drawer-nav {
+    @apply grid gap-1 overflow-y-auto p-3;
+  }
+
+  .mobile-drawer-link {
+    @apply flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-900;
+  }
+
+  .mobile-drawer-link-active {
+    @apply bg-slate-950 text-white shadow-[0_18px_38px_-30px_rgba(15,23,42,0.72)] hover:bg-slate-950 dark:bg-white dark:text-slate-950 dark:hover:bg-white;
+  }
+
+  .mobile-drawer-link-mark {
+    @apply h-2.5 w-2.5 rounded-full border border-slate-300;
+  }
+
+  .mobile-drawer-link-active .mobile-drawer-link-mark {
+    @apply border-teal-300 bg-teal-300 dark:border-teal-600 dark:bg-teal-600;
+  }
+
+  .mobile-drawer-actions {
+    @apply mt-auto grid grid-cols-2 gap-2 border-t border-slate-100 p-3 dark:border-slate-800;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+  }
+
+  .mobile-drawer-actions .btn,
+  .mobile-drawer-actions button {
+    width: 100%;
   }
 
   .mobile-menu-button {
@@ -550,6 +643,10 @@
     @apply border-slate-700 bg-slate-900/80 text-slate-100 hover:bg-slate-800;
   }
 
+  .dark .app-menu-trigger {
+    @apply border-slate-700 bg-slate-900/85 text-slate-100 hover:bg-slate-900;
+  }
+
   .dark .table-head {
     @apply bg-slate-950/70;
   }
@@ -659,7 +756,7 @@
     }
 
     .content-stage {
-      border-radius: 20px !important;
+      border-radius: 18px !important;
       padding: 0.5rem !important;
       border-left-width: 0;
       border-right-width: 0;
@@ -695,7 +792,7 @@
     .metric-card,
     .glass-panel,
     .table-wrap {
-      border-radius: 20px !important;
+      border-radius: 16px !important;
     }
 
     .hero-panel {
@@ -760,6 +857,17 @@
     table {
       max-width: 100%;
     }
+  }
+}
+
+@keyframes drawer-in {
+  0% {
+    opacity: 0.86;
+    transform: translateX(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
