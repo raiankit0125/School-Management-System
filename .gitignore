@@ -6,6 +6,7 @@ backend/node_modules/
 # Build
 dist/
 frontend/dist/
+frontend/dist-mobile/
 backend/dist/
 
 # Environment files (SECRET)
@@ -13,6 +14,9 @@ backend/dist/
 .env.*
 frontend/.env
 frontend/.env.*
+!frontend/.env.mobile
+!frontend/.env.mobile.example
+!frontend/.env.web.example
 backend/.env
 backend/.env.*
 

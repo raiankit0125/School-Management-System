@@ -25,6 +25,12 @@ const configuredOrigins = [
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
+  "http://localhost",
+  "https://localhost",
+  "http://localhost:80",
+  "https://localhost:443",
+  "capacitor://localhost",
+  "ionic://localhost",
   ...configuredOrigins,
 ];
 
@@ -45,9 +51,11 @@ app.use(
     origin(origin, cb) {
       if (!origin) return cb(null, true);
       if (isAllowedOrigin(origin)) return cb(null, true);
-      return cb(new Error(`CORS blocked for origin: ${origin}`));
+      return cb(null, false);
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     optionsSuccessStatus: 200,
   })
 );
