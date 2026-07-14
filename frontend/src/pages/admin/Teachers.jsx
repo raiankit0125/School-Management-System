@@ -121,13 +121,21 @@ const printDetails = (title, rows) => {
         <title>${title}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 32px; color: #0f172a; }
+          .preview-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+          .preview-actions button { border: 1px solid #cbd5e1; border-radius: 10px; background: #fff; color: #0f172a; cursor: pointer; font-weight: 700; padding: 10px 14px; }
+          .preview-actions button:first-child { background: #0f766e; border-color: #0f766e; color: #fff; }
           h1 { margin-bottom: 20px; }
           table { width: 100%; border-collapse: collapse; }
           th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; vertical-align: top; }
           th { width: 220px; background: #f8fafc; }
+          @media print { .preview-actions { display: none; } body { padding: 0; } }
         </style>
       </head>
       <body>
+        <div class="preview-actions">
+          <button onclick="window.print()">Print</button>
+          <button onclick="window.close(); setTimeout(function(){ if (!window.closed) history.back(); }, 100);">Cancel / Back</button>
+        </div>
         <h1>${title}</h1>
         <table>${rowHtml}</table>
       </body>

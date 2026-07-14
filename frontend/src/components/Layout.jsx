@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Button from "./Button";
@@ -90,7 +90,6 @@ export default function Layout({ children }) {
 
   const activeLink = links.find((link) => link.to === location.pathname);
   const roleHome = links[0]?.to || "/";
-  const canGoBack = location.pathname !== roleHome;
 
   const openMobileSection = (to) => {
     setMobileMenuOpen(false);
@@ -105,6 +104,14 @@ export default function Layout({ children }) {
     }
     navigate(roleHome);
   };
+
+  useEffect(() => {
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+  }, [location.pathname]);
 
   return (
     <div className={`app-shell ${shellClass} relative flex w-full min-w-0 overflow-x-hidden`}>
@@ -147,16 +154,14 @@ export default function Layout({ children }) {
                   x
                 </button>
               </div>
-              {canGoBack ? (
-                <button
-                  type="button"
-                  className="mobile-drawer-back"
-                  onClick={goBack}
-                >
-                  <span aria-hidden="true">&lt;</span>
-                  Back
-                </button>
-              ) : null}
+              <button
+                type="button"
+                className="mobile-drawer-back"
+                onClick={goBack}
+              >
+                <span aria-hidden="true">&lt;</span>
+                Back
+              </button>
               <div className="mt-5 grid grid-cols-2 gap-2">
                 <div className="rounded-2xl bg-white/10 px-3 py-3">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Role</p>
@@ -282,16 +287,14 @@ export default function Layout({ children }) {
                 <span />
                 <span />
               </button>
-              {canGoBack ? (
-                <button
-                  type="button"
-                  className="app-back-trigger"
-                  aria-label="Go back"
-                  onClick={goBack}
-                >
-                  <span aria-hidden="true">&lt;</span>
-                </button>
-              ) : null}
+              <button
+                type="button"
+                className="app-back-trigger"
+                aria-label="Go back"
+                onClick={goBack}
+              >
+                <span aria-hidden="true">&lt;</span>
+              </button>
               <div className="brand-logo brand-logo-app" aria-hidden="true">
                 <span className="brand-logo-mark">SMS</span>
                 <span className="brand-logo-ring" />
