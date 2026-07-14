@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Button from "./Button";
@@ -9,6 +10,7 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const shellClass =
     user?.role === "ADMIN"
@@ -86,6 +88,13 @@ export default function Layout({ children }) {
           { name: "Messages", to: "/student/chat" },
         ];
 
+  const activeLink = links.find((link) => link.to === location.pathname);
+
+  const openMobileSection = (to) => {
+    setMobileMenuOpen(false);
+    navigate(to);
+  };
+
   return (
     <div className={`app-shell ${shellClass} relative flex w-full min-w-0 overflow-x-hidden`}>
       <div className="workspace-backdrop">
@@ -157,18 +166,57 @@ export default function Layout({ children }) {
             </div>
 
             <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
-              <select
-                className="select-field min-w-0 lg:hidden"
-                value={links.find((link) => link.to === location.pathname)?.to || ""}
-                onChange={(event) => event.target.value && navigate(event.target.value)}
-              >
-                <option value="">Open section</option>
-                {links.map((link) => (
-                  <option key={link.to} value={link.to}>
-                    {link.name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative lg:hidden">
+                <button
+                  type="button"
+                  className="mobile-menu-button"
+                  aria-expanded={mobileMenuOpen}
+                  aria-controls="mobile-section-menu"
+                  onClick={() => setMobileMenuOpen((open) => !open)}
+                >
+                  <span className="mobile-menu-icon" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                  <span className="min-w-0 flex-1 text-left">
+                    <span className="block text-[10px] font-semibold uppercase tracking-[0.24em] text-white/55">
+                      Section
+                    </span>
+                    <span className="block truncate text-base font-semibold text-white">
+                      {activeLink?.name || "Open section"}
+                    </span>
+                  </span>
+                  <span className={`mobile-menu-caret ${mobileMenuOpen ? "rotate-180" : ""}`} aria-hidden="true">
+                    ^
+                  </span>
+                </button>
+
+                {mobileMenuOpen ? (
+                  <div className="mobile-menu-popover" id="mobile-section-menu">
+                    <div className={`mobile-menu-head bg-gradient-to-br ${roleAccent}`}>
+                      <p>Navigate</p>
+                      <strong>{user?.role} Menu</strong>
+                    </div>
+                    <div className="mobile-menu-list">
+                      {links.map((link) => {
+                        const isActive = link.to === location.pathname;
+                        return (
+                          <button
+                            key={link.to}
+                            type="button"
+                            className={`mobile-menu-item ${isActive ? "mobile-menu-item-active" : ""}`}
+                            onClick={() => openMobileSection(link.to)}
+                          >
+                            <span>{link.name}</span>
+                            <span className="mobile-menu-dot" aria-hidden="true" />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
 
               <div className="hidden items-center gap-3 rounded-2xl border border-slate-200/70 bg-white/75 px-3 py-2 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.4)] md:flex">
                 <img src={roleVisual.image} alt={roleVisual.label} className="h-11 w-11 rounded-2xl object-cover" />

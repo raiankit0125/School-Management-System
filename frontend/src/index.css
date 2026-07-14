@@ -388,6 +388,72 @@
     @apply text-white/80 hover:bg-white/10;
   }
 
+  .mobile-menu-button {
+    @apply flex w-full min-w-0 items-center gap-3 rounded-[24px] border border-cyan-300/45 px-4 py-3 text-white shadow-[0_18px_45px_-30px_rgba(8,145,178,0.7)] outline-none transition focus:ring-4 focus:ring-cyan-300/25;
+    background-color: rgba(2, 6, 23, 0.72);
+  }
+
+  .mobile-menu-icon {
+    @apply grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/15 bg-white/10;
+  }
+
+  .mobile-menu-icon span {
+    display: block;
+    height: 2px;
+    width: 18px;
+    border-radius: 999px;
+    background: #ffffff;
+  }
+
+  .mobile-menu-icon span + span {
+    margin-top: 4px;
+  }
+
+  .mobile-menu-caret {
+    @apply shrink-0 text-lg font-semibold text-white/70 transition-transform;
+    line-height: 1;
+  }
+
+  .mobile-menu-popover {
+    @apply absolute left-0 right-0 top-[calc(100%+0.6rem)] z-30 overflow-hidden rounded-[26px] border shadow-[0_26px_70px_-36px_rgba(2,6,23,0.9)] backdrop-blur-xl;
+    background-color: rgba(2, 6, 23, 0.95);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .mobile-menu-head {
+    @apply px-4 py-4 text-white;
+  }
+
+  .mobile-menu-head p {
+    @apply text-[10px] font-semibold uppercase tracking-[0.24em] text-white/60;
+  }
+
+  .mobile-menu-head strong {
+    @apply mt-1 block text-base font-semibold;
+  }
+
+  .mobile-menu-list {
+    @apply grid gap-1 p-2;
+    max-height: min(62vh, 430px);
+    overflow-y: auto;
+  }
+
+  .mobile-menu-item {
+    @apply flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold text-white/80 transition hover:bg-white/10;
+  }
+
+  .mobile-menu-item-active {
+    @apply bg-white text-slate-950 shadow-[0_16px_35px_-28px_rgba(255,255,255,0.7)];
+  }
+
+  .mobile-menu-dot {
+    @apply h-2.5 w-2.5 rounded-full border border-white/30;
+  }
+
+  .mobile-menu-item-active .mobile-menu-dot {
+    @apply border-teal-600 bg-teal-600;
+  }
+
   .role-visual-card {
     @apply rounded-[28px] border border-white/20 bg-white/10 p-4 shadow-[0_22px_50px_-36px_rgba(15,23,42,0.4)] backdrop-blur;
   }
@@ -665,6 +731,13 @@
     header .btn {
       width: auto;
       flex: 1 1 auto;
+    }
+
+    .mobile-menu-popover {
+      position: fixed;
+      left: calc(env(safe-area-inset-left) + 1rem);
+      right: calc(env(safe-area-inset-right) + 1rem);
+      top: calc(env(safe-area-inset-top) + 5.8rem);
     }
 
     th,
