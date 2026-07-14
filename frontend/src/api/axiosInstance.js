@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../config/apiConfig";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true,
+  withCredentials: import.meta.env.VITE_API_WITH_CREDENTIALS === "true",
 });
 
 
