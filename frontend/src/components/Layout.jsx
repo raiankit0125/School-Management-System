@@ -115,6 +115,97 @@ export default function Layout({ children }) {
         />
         <div className="workspace-backdrop-tint" />
       </div>
+
+      {mobileMenuOpen ? (
+        <div className="mobile-drawer-layer">
+          <button
+            type="button"
+            className="mobile-drawer-backdrop"
+            aria-label="Close menu"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <aside className="mobile-drawer">
+            <div className={`mobile-drawer-hero bg-gradient-to-br ${roleAccent}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="brand-logo brand-logo-small" aria-hidden="true">
+                    <span className="brand-logo-mark">SMS</span>
+                    <span className="brand-logo-ring" />
+                  </div>
+                  <div className="min-w-0 text-white">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/65">Workspace</p>
+                    <h2 className="truncate text-lg font-semibold">Academic Hub</h2>
+                    <p className="truncate text-xs text-white/75">{user?.name}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="mobile-drawer-close"
+                  aria-label="Close menu"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  x
+                </button>
+              </div>
+              {canGoBack ? (
+                <button
+                  type="button"
+                  className="mobile-drawer-back"
+                  onClick={goBack}
+                >
+                  <span aria-hidden="true">&lt;</span>
+                  Back
+                </button>
+              ) : null}
+              <div className="mt-5 grid grid-cols-2 gap-2">
+                <div className="rounded-2xl bg-white/10 px-3 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Role</p>
+                  <p className="mt-1 text-sm font-semibold text-white">{user?.role}</p>
+                </div>
+                <div className="rounded-2xl bg-white/10 px-3 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Section</p>
+                  <p className="mt-1 truncate text-sm font-semibold text-white">{activeLink?.name || "Dashboard"}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mobile-drawer-section-title">
+              <span>Menu</span>
+              <strong>All options</strong>
+            </div>
+            <nav className="mobile-drawer-nav">
+              {links.map((link) => {
+                const isActive = link.to === location.pathname;
+                return (
+                  <button
+                    key={link.to}
+                    type="button"
+                    className={`mobile-drawer-link ${isActive ? "mobile-drawer-link-active" : ""}`}
+                    onClick={() => openMobileSection(link.to)}
+                  >
+                    <span>{link.name}</span>
+                    <span className="mobile-drawer-link-mark" aria-hidden="true" />
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="mobile-drawer-actions">
+              <ThemeToggle />
+              <Button
+                variant="danger"
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+              >
+                Logout
+              </Button>
+            </div>
+          </aside>
+        </div>
+      ) : null}
+
       {/* Sidebar */}
       <aside className="relative hidden w-80 flex-col gap-8 border-r border-white/20 bg-slate-950/40 p-5 shadow-[10px_0_45px_-34px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:flex">
         <div className={`rounded-[28px] bg-gradient-to-br ${roleAccent} p-6 text-white shadow-xl`}>
@@ -182,7 +273,7 @@ export default function Layout({ children }) {
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
-                className="app-menu-trigger lg:hidden"
+                className="app-menu-trigger"
                 aria-label="Open full menu"
                 aria-expanded={mobileMenuOpen}
                 onClick={() => setMobileMenuOpen(true)}
@@ -194,7 +285,7 @@ export default function Layout({ children }) {
               {canGoBack ? (
                 <button
                   type="button"
-                  className="app-back-trigger lg:hidden"
+                  className="app-back-trigger"
                   aria-label="Go back"
                   onClick={goBack}
                 >
@@ -240,97 +331,6 @@ export default function Layout({ children }) {
               </div>
             </div>
           </div>
-
-          {mobileMenuOpen ? (
-            <div className="mobile-drawer-layer lg:hidden">
-              <button
-                type="button"
-                className="mobile-drawer-backdrop"
-                aria-label="Close menu"
-                onClick={() => setMobileMenuOpen(false)}
-              />
-              <aside className="mobile-drawer">
-                <div className={`mobile-drawer-hero bg-gradient-to-br ${roleAccent}`}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <div className="brand-logo brand-logo-small" aria-hidden="true">
-                        <span className="brand-logo-mark">SMS</span>
-                        <span className="brand-logo-ring" />
-                      </div>
-                      <div className="min-w-0 text-white">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/65">Workspace</p>
-                        <h2 className="truncate text-lg font-semibold">Academic Hub</h2>
-                        <p className="truncate text-xs text-white/75">{user?.name}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="mobile-drawer-close"
-                      aria-label="Close menu"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      x
-                    </button>
-                  </div>
-                  {canGoBack ? (
-                    <button
-                      type="button"
-                      className="mobile-drawer-back"
-                      onClick={goBack}
-                    >
-                      <span aria-hidden="true">&lt;</span>
-                      Back
-                    </button>
-                  ) : null}
-                  <div className="mt-5 grid grid-cols-2 gap-2">
-                    <div className="rounded-2xl bg-white/12 px-3 py-3">
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Role</p>
-                      <p className="mt-1 text-sm font-semibold text-white">{user?.role}</p>
-                    </div>
-                    <div className="rounded-2xl bg-white/12 px-3 py-3">
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-white/55">Section</p>
-                      <p className="mt-1 truncate text-sm font-semibold text-white">{activeLink?.name || "Dashboard"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mobile-drawer-section-title">
-                  <span>Menu</span>
-                  <strong>All options</strong>
-                </div>
-                <nav className="mobile-drawer-nav">
-                  {links.map((link) => {
-                    const isActive = link.to === location.pathname;
-                    return (
-                      <button
-                        key={link.to}
-                        type="button"
-                        className={`mobile-drawer-link ${isActive ? "mobile-drawer-link-active" : ""}`}
-                        onClick={() => openMobileSection(link.to)}
-                      >
-                        <span>{link.name}</span>
-                        <span className="mobile-drawer-link-mark" aria-hidden="true" />
-                      </button>
-                    );
-                  })}
-                </nav>
-
-                <div className="mobile-drawer-actions">
-                  <ThemeToggle />
-                  <Button
-                    variant="danger"
-                    onClick={() => {
-                      logout();
-                      navigate("/login");
-                    }}
-                  >
-                    Logout
-                  </Button>
-                </div>
-              </aside>
-            </div>
-          ) : null}
-
         </header>
 
         <main className="w-full min-w-0 overflow-x-hidden p-3 sm:p-5 lg:p-8">

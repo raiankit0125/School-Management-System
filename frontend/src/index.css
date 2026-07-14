@@ -438,7 +438,7 @@
   }
 
   .mobile-drawer-layer {
-    @apply fixed inset-0 z-50;
+    @apply fixed inset-0 z-[9999];
   }
 
   .mobile-drawer-backdrop {
@@ -446,7 +446,7 @@
   }
 
   .mobile-drawer {
-    @apply absolute bottom-0 left-0 top-0 flex w-[min(86vw,360px)] flex-col overflow-hidden border-r border-white/25 bg-white shadow-[28px_0_70px_-42px_rgba(2,6,23,0.82)] dark:border-slate-800 dark:bg-slate-950;
+    @apply fixed bottom-0 left-0 top-0 flex w-[min(88vw,360px)] flex-col overflow-hidden border-r border-white/25 bg-white shadow-[28px_0_70px_-42px_rgba(2,6,23,0.82)] dark:border-slate-800 dark:bg-slate-950;
     padding-top: env(safe-area-inset-top);
     animation: drawer-in 220ms ease-out both;
   }
